@@ -3,27 +3,30 @@ import java.net.Socket;
 
 public class ConnectionListener {
 
-    private ServerSocket server = null;
     private GameRoomManager roomManager = null;
+    private UserManager userManager = null;
 
-    public ConnectionListener(ServerSocket server, GameRoomManager roomManager){
+    public ConnectionListener(GameRoomManager roomManager, UserManager userManager){
 
-        this.server = server;
         this.roomManager = roomManager;
+        this.userManager = userManager;
     }
 
     void waitForConnections(){
 
         try{
-            while(true){
+            ServerSocket server = new ServerSocket(10001);
 
+            while(true){
                 Socket socket = server.accept();
-                Thread client = new Thread(new ClientController(socket));
+                Thread client = new Thread(new ClientController(socket, roomManager, userManager));
+
                 client.start();
             }
 
         } catch (Exception ex){
 
-            System.out.println("클라이언트의 접속 대기 중 오류"); }
+            System.out.println("서버 소켓 생성 및 클라이언트의 접속 대기 중 오류");
+        }
     }
 }
