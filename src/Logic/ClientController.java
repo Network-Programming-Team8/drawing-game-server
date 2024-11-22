@@ -27,8 +27,8 @@ public class ClientController implements Runnable{
             Message msgToClient = msgHandler.handle(msgFromClient);     //Create User and SERVER_LOGIN_EVENT_MESSAGE
             toClient.writeObject(msgToClient);                          //Send SERVER_LOGIN_EVENT_MESSAGE
 
-            ServerLoginEventDTO svr_login_dto = (ServerLoginEventDTO) msgToClient.getMsgDTO();
-            user = userManager.getUser(svr_login_dto.getId());
+            ServerLoginEventDTO svr_login_dto = (ServerLoginEventDTO) msgToClient.getMsgDTO();  //Extract ID from SERVER_LOGIN_EVENT_MESSAGE to Receive User Object from UserManager
+            user = userManager.getUser(svr_login_dto.getId());                                  //Receive User Object Created in UserManager
 
         } catch (Exception ex){
             System.out.println("클라이언트 접속 중 오류");

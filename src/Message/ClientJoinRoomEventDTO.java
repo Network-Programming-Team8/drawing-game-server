@@ -9,7 +9,5 @@ public class ClientJoinRoomEventDTO extends DTO{
         this.roomID = roomID;
     }
 
-    public int getRoomID(){
-        return roomID;
-    }
+    public int getRoomID(){ return roomID; }
 }
