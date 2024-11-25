@@ -5,6 +5,7 @@ import java.util.Map;
 import Message.DTO;
 import Message.ClientJoinRoomEventDTO;
 import Message.ServerJoinRoomEventDTO;
+import domain.GameRoom;
 
 public class GameRoomManager {
 

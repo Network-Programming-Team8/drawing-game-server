@@ -5,6 +5,7 @@ import java.util.Map;
 import Message.DTO;
 import Message.ClientLoginEventDTO;
 import Message.ServerLoginEventDTO;
+import domain.User;
 
 public class UserManager {
 

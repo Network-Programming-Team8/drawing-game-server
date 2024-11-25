@@ -3,6 +3,7 @@ package Logic;
 import static Message.MessageType.*;
 import Message.Message;
 import Message.DTO;
+import domain.User;
 
 public class MessageHandler {
 

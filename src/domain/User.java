@@ -1,4 +1,4 @@
-package Logic;
+package domain;
 
 public class User {
 

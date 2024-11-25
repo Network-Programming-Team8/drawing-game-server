@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import Message.Message;
 import Message.ServerLoginEventDTO;
+import domain.User;
 
 public class ClientDispatcher implements Runnable{
 

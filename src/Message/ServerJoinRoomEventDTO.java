@@ -1,6 +1,6 @@
 package Message;
 
-import Logic.GameRoom;
+import domain.GameRoom;
 
 public class ServerJoinRoomEventDTO extends DTO{
 
