@@ -1,9 +1,12 @@
-package Logic;
+package network;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import Logic.GameRoomManager;
+import Logic.MessageHandler;
+import Logic.UserManager;
 import Message.Message;
 import Message.ServerLoginEventDTO;
 import domain.User;

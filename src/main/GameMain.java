@@ -1,6 +1,6 @@
 package main;
 
-import Logic.ConnectionListener;
+import network.ConnectionListener;
 import Logic.GameRoomManager;
 import Logic.UserManager;
 

@@ -16,7 +16,7 @@ public class MessageHandler {
         this.userManager = userManager;
     }
 
-    Message handle(Message msg, User from){
+    public Message handle(Message msg, User from){
 
         switch(msg.getType()){
             case CLIENT_JOIN_ROOM_EVENT:
@@ -28,7 +28,7 @@ public class MessageHandler {
         return null;
     }
 
-    Message handle(Message msg){
+    public Message handle(Message msg){
 
         DTO returnDTO = userManager.createUser(msg.getMsgDTO());
 
