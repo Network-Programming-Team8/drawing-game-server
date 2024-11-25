@@ -30,8 +30,7 @@ public class ConnectionListener {
             }
 
         } catch (Exception ex){
-
-            System.out.println("서버 소켓 생성 및 클라이언트의 접속 대기 중 오류");
+            System.err.println("서버 소켓 생성 및 클라이언트의 접속 대기 중 오류");
         }
     }
 }
