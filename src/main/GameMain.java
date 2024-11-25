@@ -1,4 +1,8 @@
-package Logic;
+package main;
+
+import Logic.ConnectionListener;
+import Logic.GameRoomManager;
+import Logic.UserManager;
 
 public class GameMain {
     public static void main(String[] args) {

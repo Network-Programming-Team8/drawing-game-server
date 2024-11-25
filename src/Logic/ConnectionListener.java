@@ -14,7 +14,7 @@ public class ConnectionListener {
         this.userManager = userManager;
     }
 
-    void waitForConnections(){
+    public void waitForConnections(){
 
         try{
             ServerSocket server = new ServerSocket(10001);
