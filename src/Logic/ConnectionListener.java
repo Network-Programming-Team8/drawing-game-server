@@ -21,7 +21,7 @@ public class ConnectionListener {
 
             while(true){
                 Socket socket = server.accept();
-                Thread client = new Thread(new ClientController(socket, roomManager, userManager));
+                Thread client = new Thread(new ClientDispatcher(socket, roomManager, userManager));
 
                 client.start();
             }

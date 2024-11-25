@@ -7,14 +7,14 @@ import java.net.Socket;
 import Message.Message;
 import Message.ServerLoginEventDTO;
 
-public class ClientController implements Runnable{
+public class ClientDispatcher implements Runnable{
 
     private final MessageHandler msgHandler = null;
     private ObjectInputStream fromClient = null;
     private ObjectOutputStream toClient = null;
     private User user = null;
 
-    public ClientController(Socket socket, GameRoomManager roomManager, UserManager userManager){
+    public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
 
         MessageHandler msgHandler = new MessageHandler(roomManager, userManager);
 
