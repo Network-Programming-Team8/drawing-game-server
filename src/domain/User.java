@@ -6,7 +6,6 @@ public class User {
     private final String nickname;
 
     public User(int id, String nickname){
-
         this.id = id;
         this.nickname = nickname;
     }

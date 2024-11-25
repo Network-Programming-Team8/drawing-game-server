@@ -8,7 +8,6 @@ public class Message implements Serializable {
     private final DTO msgDto;
 
     public Message(MessageType msgType, DTO msgDto){
-
         this.msgType = msgType;
         this.msgDto = msgDto;
     }
