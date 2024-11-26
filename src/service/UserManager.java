@@ -1,4 +1,4 @@
-package Logic;
+package service;
 
 import java.util.Map;
 

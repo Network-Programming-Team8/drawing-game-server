@@ -5,9 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import Logic.GameRoomManager;
-import Logic.MessageHandler;
-import Logic.UserManager;
+import service.GameRoomManager;
+import handler.MessageHandler;
+import service.UserManager;
 import dto.ClientLoginEventDTO;
 import dto.ServerErrorEventDTO;
 import exception.GameServerException;
@@ -18,7 +18,6 @@ import dto.ServerLoginEventDTO;
 import static message.MessageType.*;
 
 public class ClientDispatcher implements Runnable{
-    private final GameRoomManager roomManager;
     private final UserManager userManager;
     private final MessageHandler messageHandler;
 
@@ -28,9 +27,8 @@ public class ClientDispatcher implements Runnable{
     boolean isConnected = false;
 
     public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
-        this.roomManager = roomManager;
         this.userManager = userManager;
-        messageHandler = new MessageHandler(roomManager, userManager);
+        messageHandler = new MessageHandler(roomManager);
         try{
             fromClient = new ObjectInputStream(socket.getInputStream());
             toClient = new ObjectOutputStream(socket.getOutputStream());

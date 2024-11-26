@@ -1,7 +1,7 @@
 package network;
 
-import Logic.GameRoomManager;
-import Logic.UserManager;
+import service.GameRoomManager;
+import service.UserManager;
 
 import java.net.ServerSocket;
 import java.net.Socket;

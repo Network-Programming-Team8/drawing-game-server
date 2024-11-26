@@ -1,8 +1,8 @@
 package main;
 
 import network.ConnectionListener;
-import Logic.GameRoomManager;
-import Logic.UserManager;
+import service.GameRoomManager;
+import service.UserManager;
 
 public class GameMain {
     public static void main(String[] args) {
