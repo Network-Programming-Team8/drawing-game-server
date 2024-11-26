@@ -7,8 +7,8 @@ import java.net.Socket;
 import Logic.GameRoomManager;
 import Logic.MessageHandler;
 import Logic.UserManager;
-import Message.Message;
-import Message.ServerLoginEventDTO;
+import message.Message;
+import dto.ServerLoginEventDTO;
 import domain.User;
 
 public class ClientDispatcher implements Runnable{

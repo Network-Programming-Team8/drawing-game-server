@@ -2,9 +2,9 @@ package Logic;
 
 import java.util.Map;
 
-import Message.DTO;
-import Message.ClientJoinRoomEventDTO;
-import Message.ServerJoinRoomEventDTO;
+import dto.DTO;
+import dto.ClientJoinRoomEventDTO;
+import dto.ServerJoinRoomEventDTO;
 import domain.GameRoom;
 
 public class GameRoomManager {

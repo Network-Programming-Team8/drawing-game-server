@@ -1,4 +1,4 @@
-package Message;
+package dto;
 
 public class ClientJoinRoomEventDTO extends DTO{
 

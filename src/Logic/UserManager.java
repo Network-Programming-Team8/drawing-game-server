@@ -2,9 +2,9 @@ package Logic;
 
 import java.util.Map;
 
-import Message.DTO;
-import Message.ClientLoginEventDTO;
-import Message.ServerLoginEventDTO;
+import dto.DTO;
+import dto.ClientLoginEventDTO;
+import dto.ServerLoginEventDTO;
 import domain.User;
 
 public class UserManager {

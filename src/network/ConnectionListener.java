@@ -12,7 +12,6 @@ public class ConnectionListener {
     private UserManager userManager = null;
 
     public ConnectionListener(GameRoomManager roomManager, UserManager userManager){
-
         this.roomManager = roomManager;
         this.userManager = userManager;
     }
@@ -24,9 +23,8 @@ public class ConnectionListener {
 
             while(true){
                 Socket socket = server.accept();
-                Thread client = new Thread(new ClientDispatcher(socket, roomManager, userManager));
-
-                client.start();
+                Thread connection = new Thread(new ClientDispatcher(socket, roomManager, userManager));
+                connection.start();
             }
 
         } catch (Exception ex){

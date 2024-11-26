@@ -1,4 +1,6 @@
-package Message;
+package message;
+
+import dto.DTO;
 
 import java.io.Serializable;
 

@@ -1,8 +1,8 @@
 package Logic;
 
-import static Message.MessageType.*;
-import Message.Message;
-import Message.DTO;
+import static message.MessageType.*;
+import message.Message;
+import dto.DTO;
 import domain.User;
 
 public class MessageHandler {

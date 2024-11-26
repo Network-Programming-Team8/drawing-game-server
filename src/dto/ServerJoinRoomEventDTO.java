@@ -1,4 +1,4 @@
-package Message;
+package dto;
 
 import domain.GameRoom;
 
