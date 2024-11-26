@@ -15,7 +15,11 @@ public class UserManager {
         return newUser;
     }
 
-    public User getUser(int id){    //Only Use When After Login to Receive User Object at ClientController
+    public User getUser (int id) {    //Only Use When After Login to Receive User Object at ClientController
         return userList.get(id);
+    }
+
+    public void deleteUser (int id) {
+        userList.remove(id);
     }
 }
