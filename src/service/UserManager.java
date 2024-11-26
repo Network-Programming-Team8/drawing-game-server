@@ -18,14 +18,4 @@ public class UserManager {
     public User getUser(int id){    //Only Use When After Login to Receive User Object at ClientController
         return userList.get(id);
     }
-
-    public void join(int id){
-
-
-    }
-
-    public void leave(int id){
-
-
-    }
 }
