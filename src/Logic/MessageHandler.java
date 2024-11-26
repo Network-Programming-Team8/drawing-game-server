@@ -1,6 +1,8 @@
 package Logic;
 
 import static message.MessageType.*;
+
+import exception.GameServerException;
 import message.Message;
 import dto.DTO;
 import domain.User;
@@ -15,7 +17,7 @@ public class MessageHandler {
         this.userManager = userManager;
     }
 
-    public Message handle(Message msg, User from){
+    public Message handle(Message msg, User from) throws GameServerException {
         Message response = null;
         switch(msg.getType()){
             case CLIENT_JOIN_ROOM_EVENT:

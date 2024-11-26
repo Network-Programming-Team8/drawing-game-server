@@ -1,7 +1,7 @@
 package message;
 
 public enum MessageType {
-    ERROR_EVENT,
+    SERVER_ERROR_EVENT,
     CLIENT_LOGIN_EVENT,
     SERVER_LOGIN_EVENT,
     CLIENT_JOIN_ROOM_EVENT,
