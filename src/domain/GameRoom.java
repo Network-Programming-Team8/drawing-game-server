@@ -19,9 +19,8 @@ public class GameRoom {
         userList.add(owner);
     }
 
-    public GameRoom addUser(User user) {
+    public void addUser(User user) {
         userList.add(user);
-        return this;
     }
 
     public int getId() {
