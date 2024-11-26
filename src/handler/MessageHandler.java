@@ -32,6 +32,9 @@ public class MessageHandler {
     }
 
     private DTO handleCreateRoomEvent(ClientCreateRoomEventDTO request, User from) throws GameServerException {
+        if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
+            throw new GameServerException("참가자 수와 제한 시간은 양수여야 합니다");
+        }
         room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from);
         return new ServerCreateRoomEventDTO(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
     }
