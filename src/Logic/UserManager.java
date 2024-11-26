@@ -2,9 +2,6 @@ package Logic;
 
 import java.util.Map;
 
-import dto.DTO;
-import dto.ClientLoginEventDTO;
-import dto.ServerLoginEventDTO;
 import domain.User;
 
 public class UserManager {
@@ -12,17 +9,13 @@ public class UserManager {
     private Map<Integer, User> userList;
     private int lastID = 0;
 
-    public DTO createUser(DTO dto){
-
-        ClientLoginEventDTO cli_login_dto = (ClientLoginEventDTO) dto;
-        User newUser = new User(++lastID, cli_login_dto.getNickName());
+    public User createUser(String nickName){
+        User newUser = new User(++lastID, nickName);
         userList.put(lastID, newUser);
-
-        return (DTO) new ServerLoginEventDTO( newUser.getNickname(), newUser.getID());
+        return newUser;
     }
 
     public User getUser(int id){    //Only Use When After Login to Receive User Object at ClientController
-
         return userList.get(id);
     }
 

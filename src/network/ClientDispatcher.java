@@ -1,5 +1,6 @@
 package network;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -7,56 +8,81 @@ import java.net.Socket;
 import Logic.GameRoomManager;
 import Logic.MessageHandler;
 import Logic.UserManager;
+import dto.ClientLoginEventDTO;
 import message.Message;
-import dto.ServerLoginEventDTO;
 import domain.User;
+import dto.ServerLoginEventDTO;
+
+import static message.MessageType.CLIENT_LOGIN_EVENT;
+import static message.MessageType.SERVER_LOGIN_EVENT;
 
 public class ClientDispatcher implements Runnable{
+    private final GameRoomManager roomManager;
+    private final UserManager userManager;
+    private final MessageHandler messageHandler;
 
-    private final MessageHandler msgHandler = null;
-    private ObjectInputStream fromClient = null;
-    private ObjectOutputStream toClient = null;
-    private User user = null;
+    private ObjectInputStream fromClient;
+    private ObjectOutputStream toClient;
 
     public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
-
-        MessageHandler msgHandler = new MessageHandler(roomManager, userManager);
-
+        this.roomManager = roomManager;
+        this.userManager = userManager;
+        messageHandler = new MessageHandler(roomManager, userManager);
         try{
             fromClient = new ObjectInputStream(socket.getInputStream());
             toClient = new ObjectOutputStream(socket.getOutputStream());
-
-            //Login
-            Message msgFromClient = (Message) fromClient.readObject();  //Receive CLIENT_LOGIN_EVENT_MESSAGE
-            Message msgToClient = msgHandler.handle(msgFromClient);     //Create User and SERVER_LOGIN_EVENT_MESSAGE
-            toClient.writeObject(msgToClient);                          //Send SERVER_LOGIN_EVENT_MESSAGE
-
-            ServerLoginEventDTO svr_login_dto = (ServerLoginEventDTO) msgToClient.getMsgDTO();  //Extract ID from SERVER_LOGIN_EVENT_MESSAGE to Receive User Object from UserManager
-            user = userManager.getUser(svr_login_dto.getId());                                  //Receive User Object Created in UserManager
-
         } catch (Exception ex){
-            System.out.println("클라이언트 접속 중 오류");
+            System.err.println("클라이언트 접속 중 오류");
         }
     }
 
-    public void receiveAndSendMessage(){
+    private Message getMessageFromClient() {
+        Message message = null;
+        try {
+            message = (Message) fromClient.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("수신 중 오류");
+        }
+        return message;
+    }
 
-        try{
-            Message msgFromClient = (Message) fromClient.readObject();
-            Message msgToClient = msgHandler.handle(msgFromClient, user);
-            toClient.writeObject(msgToClient);
-
-        } catch (Exception ex){
-            System.out.println("통신 중 오류");
+    private void sendMessageToClient(Message message) {
+        try {
+            toClient.writeObject(message);
+        } catch (IOException e) {
+            System.err.println("송신 중 오류");
         }
 
+    }
+    private void receiveAndSendMessageWith(User user){
+        Message msgFromClient = getMessageFromClient();
+        Message msgToClient = messageHandler.handle(msgFromClient, user);
+        sendMessageToClient(msgToClient);
+    }
+
+    private User createUser() {
+        User user = null;
+        Message msgFromClient = getMessageFromClient();
+
+        if(msgFromClient.getType() != CLIENT_LOGIN_EVENT) {
+            System.err.println("최초 메세지는 로그인 요청이어야 합니다");
+        }
+
+        ClientLoginEventDTO clientLoginEventDTO = (ClientLoginEventDTO) msgFromClient.getMsgDTO();
+        user = userManager.createUser(clientLoginEventDTO.getNickName());
+        ServerLoginEventDTO serverLoginEventDTO = new ServerLoginEventDTO(user.getNickname(), user.getID());
+
+        Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEventDTO);
+        sendMessageToClient(msgToClient);
+
+        return user;
     }
 
     @Override
     public void run(){
-
+        User user = createUser();
         while(true){
-            receiveAndSendMessage();
+            receiveAndSendMessageWith(user);
         }
     }
 }
