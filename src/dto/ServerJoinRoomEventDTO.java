@@ -1,17 +1,19 @@
 package dto;
 
-import domain.GameRoom;
+import domain.User;
+
+import java.util.List;
 
 public class ServerJoinRoomEventDTO extends DTO{
+    int id;
+    int drawTimeLimit;
+    int participantLimit;
+    List<User> userList;
 
-    private final GameRoom gameRoom;
-
-    public ServerJoinRoomEventDTO(GameRoom gameRoom){
-
-        this.gameRoom = gameRoom;
-    }
-
-    public GameRoom getGameRoom() {
-        return gameRoom;
+    public ServerJoinRoomEventDTO(int id, int drawTimeLimit, int participantLimit, List<User> userList){
+        this.id = id;
+        this.drawTimeLimit = drawTimeLimit;
+        this.participantLimit = participantLimit;
+        this.userList = userList;
     }
 }
