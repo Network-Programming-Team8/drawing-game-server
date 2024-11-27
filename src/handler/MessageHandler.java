@@ -42,6 +42,7 @@ public class MessageHandler {
     private DTO handleJoinRoomEvent(ClientJoinRoomEventDTO request, User from) throws GameServerException {
         room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        return new ServerJoinRoomEventDTO(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit(), room.getUserList());
+        return new ServerJoinRoomEventDTO(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit(),
+                room.getUserList().stream().map(user -> new UserInfo(user.getID(), user.getNickname(), false)).toList());
     }
 }

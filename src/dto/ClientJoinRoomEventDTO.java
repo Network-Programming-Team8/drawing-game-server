@@ -5,7 +5,6 @@ public class ClientJoinRoomEventDTO extends DTO{
     int roomID;
 
     public ClientJoinRoomEventDTO(int roomID){
-
         this.roomID = roomID;
     }
 
