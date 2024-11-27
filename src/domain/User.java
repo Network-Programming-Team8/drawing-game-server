@@ -10,7 +10,7 @@ public class User {
         this.nickname = nickname;
     }
 
-    public int getID() {
+    public int getId() {
         return id;
     }
     public String getNickname() {

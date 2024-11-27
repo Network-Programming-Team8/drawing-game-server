@@ -8,6 +8,6 @@ public class RoomMapper {
         return new RoomInfo(room.getId(),
                 room.getDrawTimeLimit(),
                 room.getParticipantLimit(),
-                room.getUserList().stream().map(user -> UserMapper.toUserInfo(user, room.isReady(user))).toList());
+                room.getUserList().stream().map(user -> UserMapper.toUserInfo(user, room.isReady(user.getId()))).toList());
     }
 }

@@ -1,7 +1,9 @@
 package domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Room {
 
@@ -10,6 +12,7 @@ public class Room {
     int participantLimit;
     User owner;
     List<User> userList = new ArrayList<User>();
+    Map<Integer, Boolean> readyStatusMap = new HashMap<>();
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner){
         this.id = id;
@@ -17,10 +20,12 @@ public class Room {
         this.participantLimit = participantLimit;
         this.owner = owner;
         userList.add(owner);
+        readyStatusMap.put(owner.getId(), false);
     }
 
     public void addUser(User user) {
         userList.add(user);
+        readyStatusMap.put(user.getId(), false);
     }
 
     public int getId() {
@@ -39,7 +44,7 @@ public class Room {
         return userList;
     }
 
-    public boolean isReady(User user) {
-        return false; //TODO user별 isReady 관리하기
+    public boolean isReady(int userId) {
+        return readyStatusMap.get(userId);
     }
 }

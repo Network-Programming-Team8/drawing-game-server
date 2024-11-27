@@ -94,7 +94,7 @@ public class ClientDispatcher implements Runnable{
 
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();
         user = userManager.createUser(clientLoginEvent.getNickName());
-        ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getID());
+        ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
         Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);
         sendMessageToClient(msgToClient);
