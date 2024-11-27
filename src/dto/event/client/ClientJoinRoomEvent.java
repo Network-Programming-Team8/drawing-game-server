@@ -2,11 +2,11 @@ package dto.event.client;
 
 import dto.event.Event;
 
-public class ClientJoinRoomEventDTO extends Event {
+public class ClientJoinRoomEvent extends Event {
 
     int roomID;
 
-    public ClientJoinRoomEventDTO(int roomID){
+    public ClientJoinRoomEvent(int roomID){
         this.roomID = roomID;
     }
 

@@ -2,11 +2,11 @@ package dto.event.client;
 
 import dto.event.Event;
 
-public class ClientLoginEventDTO extends Event {
+public class ClientLoginEvent extends Event {
 
     private final String nickname;
 
-    public ClientLoginEventDTO(String nickname){
+    public ClientLoginEvent(String nickname){
         this.nickname = nickname;
     }
 

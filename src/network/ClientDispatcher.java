@@ -8,12 +8,12 @@ import java.net.Socket;
 import service.GameRoomManager;
 import handler.MessageHandler;
 import service.UserManager;
-import dto.event.client.ClientLoginEventDTO;
-import dto.event.server.ServerErrorEventDTO;
+import dto.event.client.ClientLoginEvent;
+import dto.event.server.ServerErrorEvent;
 import exception.GameServerException;
 import message.Message;
 import domain.User;
-import dto.event.server.ServerLoginEventDTO;
+import dto.event.server.ServerLoginEvent;
 
 import static message.MessageType.*;
 
@@ -73,7 +73,7 @@ public class ClientDispatcher implements Runnable{
             System.err.println("에러 메시지 송신 불가: 클라이언트와 연결이 끊어졌습니다.");
         }
         String errorMessage = e.getMessage();
-        Message message = new Message(SERVER_ERROR_EVENT, new ServerErrorEventDTO(errorMessage));
+        Message message = new Message(SERVER_ERROR_EVENT, new ServerErrorEvent(errorMessage));
         sendMessageToClient(message);
         System.err.println("에러 메세지 송신됨: " + errorMessage);
     }
@@ -92,11 +92,11 @@ public class ClientDispatcher implements Runnable{
             throw new GameServerException("최초 메세지는 로그인 요청이어야 합니다");
         }
 
-        ClientLoginEventDTO clientLoginEventDTO = (ClientLoginEventDTO) msgFromClient.getMsgDTO();
-        user = userManager.createUser(clientLoginEventDTO.getNickName());
-        ServerLoginEventDTO serverLoginEventDTO = new ServerLoginEventDTO(user.getNickname(), user.getID());
+        ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();
+        user = userManager.createUser(clientLoginEvent.getNickName());
+        ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getID());
 
-        Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEventDTO);
+        Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);
         sendMessageToClient(msgToClient);
 
         return user;
