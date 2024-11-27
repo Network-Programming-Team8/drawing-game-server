@@ -3,7 +3,7 @@ package domain;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameRoom {
+public class Room {
 
     int id;
     int drawTimeLimit;
@@ -11,7 +11,7 @@ public class GameRoom {
     User owner;
     List<User> userList = new ArrayList<User>();
 
-    public GameRoom(int id, int drawTimeLimit, int participantLimit, User owner){
+    public Room(int id, int drawTimeLimit, int participantLimit, User owner){
         this.id = id;
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;

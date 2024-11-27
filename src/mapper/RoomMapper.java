@@ -1,10 +1,10 @@
 package mapper;
 
-import domain.GameRoom;
+import domain.Room;
 import dto.info.RoomInfo;
 
 public class RoomMapper {
-    public static RoomInfo toRoomInfo(GameRoom room) {
+    public static RoomInfo toRoomInfo(Room room) {
         return new RoomInfo(room.getId(),
                 room.getDrawTimeLimit(),
                 room.getParticipantLimit(),

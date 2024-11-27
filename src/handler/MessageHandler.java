@@ -2,13 +2,12 @@ package handler;
 
 import static message.MessageType.*;
 
-import domain.GameRoom;
+import domain.Room;
 import dto.event.Event;
 import dto.event.client.ClientCreateRoomEventDTO;
 import dto.event.client.ClientJoinRoomEventDTO;
 import dto.event.server.ServerCreateRoomEventDTO;
 import dto.event.server.ServerJoinRoomEventDTO;
-import dto.info.UserInfo;
 import exception.GameServerException;
 import mapper.RoomMapper;
 import message.Message;
@@ -17,7 +16,7 @@ import service.GameRoomManager;
 
 public class MessageHandler {
     private final GameRoomManager roomManager;
-    private GameRoom room = null;
+    private Room room = null;
 
     public MessageHandler(GameRoomManager roomManager){
         this.roomManager = roomManager;
