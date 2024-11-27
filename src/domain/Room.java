@@ -1,5 +1,7 @@
 package domain;
 
+import exception.GameServerException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +25,10 @@ public class Room {
         readyStatusMap.put(owner.getId(), false);
     }
 
-    public void addUser(User user) {
+    public void addUser(User user) throws GameServerException {
+        if(userList.size() == participantLimit) {
+            throw new GameServerException(String.format("방이 다 찼습니다. (최대 인원: %d명)", participantLimit));
+        }
         userList.add(user);
         readyStatusMap.put(user.getId(), false);
     }
