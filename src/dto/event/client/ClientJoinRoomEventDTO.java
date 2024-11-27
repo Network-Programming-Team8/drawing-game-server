@@ -1,6 +1,8 @@
-package dto;
+package dto.event.client;
 
-public class ClientJoinRoomEventDTO extends DTO{
+import dto.event.Event;
+
+public class ClientJoinRoomEventDTO extends Event {
 
     int roomID;
 

@@ -1,6 +1,8 @@
-package dto;
+package dto.event.server;
 
-public class ServerCreateRoomEventDTO extends DTO{
+import dto.event.Event;
+
+public class ServerCreateRoomEventDTO extends Event {
     int id;
     int drawTimeLimit;
     int participantLimit;

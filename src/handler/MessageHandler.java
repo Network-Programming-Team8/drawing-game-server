@@ -3,8 +3,14 @@ package handler;
 import static message.MessageType.*;
 
 import domain.GameRoom;
-import dto.*;
+import dto.event.Event;
+import dto.event.client.ClientCreateRoomEventDTO;
+import dto.event.client.ClientJoinRoomEventDTO;
+import dto.event.server.ServerCreateRoomEventDTO;
+import dto.event.server.ServerJoinRoomEventDTO;
+import dto.info.UserInfo;
 import exception.GameServerException;
+import mapper.RoomMapper;
 import message.Message;
 import domain.User;
 import service.GameRoomManager;
@@ -31,7 +37,7 @@ public class MessageHandler {
         return response;
     }
 
-    private DTO handleCreateRoomEvent(ClientCreateRoomEventDTO request, User from) throws GameServerException {
+    private Event handleCreateRoomEvent(ClientCreateRoomEventDTO request, User from) throws GameServerException {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
             throw new GameServerException("참가자 수와 제한 시간은 양수여야 합니다");
         }
@@ -39,10 +45,9 @@ public class MessageHandler {
         return new ServerCreateRoomEventDTO(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
     }
 
-    private DTO handleJoinRoomEvent(ClientJoinRoomEventDTO request, User from) throws GameServerException {
+    private Event handleJoinRoomEvent(ClientJoinRoomEventDTO request, User from) throws GameServerException {
         room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        return new ServerJoinRoomEventDTO(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit(),
-                room.getUserList().stream().map(user -> new UserInfo(user.getID(), user.getNickname(), false)).toList());
+        return new ServerJoinRoomEventDTO(RoomMapper.toRoomInfo(room));
     }
 }

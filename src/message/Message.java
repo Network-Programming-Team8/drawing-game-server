@@ -1,23 +1,23 @@
 package message;
 
-import dto.DTO;
+import dto.event.Event;
 
 import java.io.Serializable;
 
 public class Message implements Serializable {
 
     private final MessageType msgType;
-    private final DTO msgDto;
+    private final Event event;
 
-    public Message(MessageType msgType, DTO msgDto){
+    public Message(MessageType msgType, Event event){
         this.msgType = msgType;
-        this.msgDto = msgDto;
+        this.event = event;
     }
 
     public MessageType getType(){
         return msgType;
     }
-    public DTO getMsgDTO(){
-        return msgDto;
+    public Event getMsgDTO(){
+        return event;
     }
 }

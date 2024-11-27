@@ -38,4 +38,8 @@ public class GameRoom {
     public List<User> getUserList() {
         return userList;
     }
+
+    public boolean isReady(User user) {
+        return false; //TODO user별 isReady 관리하기
+    }
 }

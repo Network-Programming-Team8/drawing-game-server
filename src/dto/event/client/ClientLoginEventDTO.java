@@ -1,6 +1,8 @@
-package dto;
+package dto.event.client;
 
-public class ClientLoginEventDTO extends DTO {
+import dto.event.Event;
+
+public class ClientLoginEventDTO extends Event {
 
     private final String nickname;
 

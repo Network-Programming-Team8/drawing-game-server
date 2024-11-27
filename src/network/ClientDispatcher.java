@@ -8,12 +8,12 @@ import java.net.Socket;
 import service.GameRoomManager;
 import handler.MessageHandler;
 import service.UserManager;
-import dto.ClientLoginEventDTO;
-import dto.ServerErrorEventDTO;
+import dto.event.client.ClientLoginEventDTO;
+import dto.event.server.ServerErrorEventDTO;
 import exception.GameServerException;
 import message.Message;
 import domain.User;
-import dto.ServerLoginEventDTO;
+import dto.event.server.ServerLoginEventDTO;
 
 import static message.MessageType.*;
 

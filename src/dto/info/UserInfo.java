@@ -1,6 +1,6 @@
-package dto;
+package dto.info;
 
-public class UserInfo extends DTO{
+public class UserInfo {
     private final int id;
     private final String nickname;
     private final boolean isReady;

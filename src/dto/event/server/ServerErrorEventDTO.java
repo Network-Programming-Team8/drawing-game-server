@@ -1,6 +1,8 @@
-package dto;
+package dto.event.server;
 
-public class ServerErrorEventDTO extends DTO{
+import dto.event.Event;
+
+public class ServerErrorEventDTO extends Event {
     String errorMsg;
     public ServerErrorEventDTO(String errorMsg) {
         errorMsg = this.errorMsg;

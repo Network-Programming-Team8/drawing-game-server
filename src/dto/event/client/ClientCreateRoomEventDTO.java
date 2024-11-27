@@ -1,6 +1,8 @@
-package dto;
+package dto.event.client;
 
-public class ClientCreateRoomEventDTO extends DTO{
+import dto.event.Event;
+
+public class ClientCreateRoomEventDTO extends Event {
     int drawTimeLimit;
     int participantLimit;
 
