@@ -1,12 +1,13 @@
 package service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import domain.User;
 
 public class UserManager {
 
-    private Map<Integer, User> userList;
+    private final Map<Integer, User> userList = new HashMap<Integer, User>();
     private int lastID = 0;
 
     public User createUser(String nickName){

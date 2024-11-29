@@ -53,6 +53,7 @@ public class ClientDispatcher implements Runnable{
         Message message = null;
         try {
             message = (Message) fromClient.readObject();
+            System.out.println(message.getType());
         } catch (IOException | ClassNotFoundException e) {
             throw new GameServerException("수신 중 오류");
         }
