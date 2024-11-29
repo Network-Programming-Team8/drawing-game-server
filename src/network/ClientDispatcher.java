@@ -30,8 +30,8 @@ public class ClientDispatcher implements Runnable{
         this.userManager = userManager;
         messageHandler = new MessageHandler(roomManager);
         try{
-            fromClient = new ObjectInputStream(socket.getInputStream());
             toClient = new ObjectOutputStream(socket.getOutputStream());
+            fromClient = new ObjectInputStream(socket.getInputStream());
             isConnected = true;
         } catch (Exception ex){
             System.err.println("클라이언트 접속 중 오류");
