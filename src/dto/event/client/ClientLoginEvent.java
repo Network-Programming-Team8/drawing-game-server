@@ -2,9 +2,12 @@ package dto.event.client;
 
 import dto.event.Event;
 
+import java.io.Serial;
+
 public class ClientLoginEvent extends Event {
 
-    private static final long serialVersionUID = 1L;
+    @Serial
+    private static final long serialVersionUID = -7817904659621476741L;
     private final String nickname;
 
     public ClientLoginEvent(String nickname){

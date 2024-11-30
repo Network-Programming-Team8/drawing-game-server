@@ -2,8 +2,12 @@ package dto.event.client;
 
 import dto.event.Event;
 
+import java.io.Serial;
+
 public class ClientCreateRoomEvent extends Event {
-    private static final long serialVersionUID = 3L;
+
+    @Serial
+    private static final long serialVersionUID = -8210692791240086745L;
     int drawTimeLimit;
     int participantLimit;
 

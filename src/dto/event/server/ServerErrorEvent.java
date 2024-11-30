@@ -2,9 +2,12 @@ package dto.event.server;
 
 import dto.event.Event;
 
+import java.io.Serial;
+
 public class ServerErrorEvent extends Event {
 
-    private static final long serialVersionUID = 6L;
+    @Serial
+    private static final long serialVersionUID = 7978303806957878122L;
     String errorMsg;
     public ServerErrorEvent(String errorMsg) {
         errorMsg = this.errorMsg;
