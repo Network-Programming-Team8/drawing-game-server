@@ -2,17 +2,17 @@ package handler;
 
 import static message.MessageType.*;
 
+import domain.User;
 import domain.Room;
+import mapper.RoomMapper;
+import service.GameRoomManager;
+import message.Message;
 import dto.event.Event;
 import dto.event.client.ClientCreateRoomEvent;
 import dto.event.client.ClientJoinRoomEvent;
 import dto.event.server.ServerCreateRoomEvent;
 import dto.event.server.ServerJoinRoomEvent;
 import exception.GameServerException;
-import mapper.RoomMapper;
-import message.Message;
-import domain.User;
-import service.GameRoomManager;
 
 public class MessageHandler {
     private final GameRoomManager roomManager;
