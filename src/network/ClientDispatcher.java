@@ -1,21 +1,22 @@
 package network;
 
-import java.io.IOException;
+import java.net.Socket;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
-
-import service.GameRoomManager;
-import handler.MessageHandler;
-import service.UserManager;
-import dto.event.client.ClientLoginEvent;
-import dto.event.server.ServerErrorEvent;
-import exception.GameServerException;
-import message.Message;
-import domain.User;
-import dto.event.server.ServerLoginEvent;
+import java.io.IOException;
 
 import static message.MessageType.*;
+
+import domain.User;
+import service.UserManager;
+import service.GameRoomManager;
+import handler.MessageHandler;
+import message.Message;
+import dto.event.client.ClientLoginEvent;
+import dto.event.server.ServerLoginEvent;
+import dto.event.server.ServerErrorEvent;
+import exception.GameServerException;
+
 
 public class ClientDispatcher implements Runnable{
     private final UserManager userManager;
