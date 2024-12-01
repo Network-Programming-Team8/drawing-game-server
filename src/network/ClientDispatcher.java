@@ -10,7 +10,7 @@ import static message.MessageType.*;
 import domain.User;
 import service.UserManager;
 import service.GameRoomManager;
-import handler.MessageHandler;
+import message.handler.MessageHandler;
 import message.Message;
 import dto.event.client.ClientLoginEvent;
 import dto.event.server.ServerLoginEvent;
