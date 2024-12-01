@@ -8,8 +8,9 @@ public class ServerErrorEvent extends Event {
 
     @Serial
     private static final long serialVersionUID = 7978303806957878122L;
-    String errorMsg;
+    private final String errorMsg;
+
     public ServerErrorEvent(String errorMsg) {
-        errorMsg = this.errorMsg;
+        this.errorMsg = errorMsg;
     }
 }

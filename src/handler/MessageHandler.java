@@ -12,7 +12,7 @@ import dto.event.Event;
 import dto.event.client.ClientCreateRoomEvent;
 import dto.event.client.ClientJoinRoomEvent;
 import dto.event.server.ServerCreateRoomEvent;
-import dto.event.server.ServerJoinRoomEvent;
+import dto.event.server.ServerRoomUpdateEvent;
 import exception.GameServerException;
 
 public class MessageHandler {
@@ -48,6 +48,6 @@ public class MessageHandler {
     private Event handleJoinRoomEvent(ClientJoinRoomEvent request, User from) throws GameServerException {
         room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        return new ServerJoinRoomEvent(RoomMapper.toRoomInfo(room));
+        return new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
     }
 }
