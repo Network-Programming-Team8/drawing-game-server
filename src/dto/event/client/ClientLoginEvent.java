@@ -14,5 +14,7 @@ public class ClientLoginEvent extends Event {
         this.nickname = nickname;
     }
 
-    public String getNickName(){ return nickname; }
+    public String getNickName(){
+        return nickname;
+    }
 }

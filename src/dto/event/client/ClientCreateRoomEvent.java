@@ -8,8 +8,8 @@ public class ClientCreateRoomEvent extends Event {
 
     @Serial
     private static final long serialVersionUID = -8210692791240086745L;
-    int drawTimeLimit;
-    int participantLimit;
+    private final int drawTimeLimit;
+    private final int participantLimit;
 
     public ClientCreateRoomEvent(int drawTimeLimit, int participantLimit){
         this.drawTimeLimit = drawTimeLimit;
@@ -19,7 +19,6 @@ public class ClientCreateRoomEvent extends Event {
     public int getDrawTimeLimit(){
         return drawTimeLimit;
     }
-
     public int getParticipantLimit() {
         return participantLimit;
     }

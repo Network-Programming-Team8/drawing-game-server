@@ -8,11 +8,12 @@ public class ClientJoinRoomEvent extends Event {
 
     @Serial
     private static final long serialVersionUID = 4703348475502347231L;
-    int roomID;
+    private final int roomID;
 
     public ClientJoinRoomEvent(int roomID){
         this.roomID = roomID;
     }
-
-    public int getRoomID(){ return roomID; }
+    public int getRoomID(){
+        return roomID;
+    }
 }
