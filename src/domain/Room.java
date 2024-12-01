@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class Room {
 
-    int id;
-    int drawTimeLimit;
+    private final int id;
+    private final int drawTimeLimit;
     int participantLimit;
-    User owner;
-    List<User> userList = new ArrayList<>();
-    Map<Integer, Boolean> readyStatusMap = new HashMap<>();
+    private User owner;
+    private final List<User> userList = new ArrayList<>();
+    private final Map<Integer, Boolean> readyStatusMap = new HashMap<>();
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner){
         this.id = id;
