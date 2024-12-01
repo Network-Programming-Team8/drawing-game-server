@@ -29,10 +29,12 @@ public class MessageHandler {
             case CLIENT_CREATE_ROOM_EVENT:
                 response = new Message(SERVER_CREATE_ROOM_EVENT,
                         handleCreateRoomEvent((ClientCreateRoomEvent) (msg.getMsgDTO()), from));
+                break;
 
             case CLIENT_JOIN_ROOM_EVENT:
                 response = new Message(SERVER_ROOM_UPDATE_EVENT,
                         handleJoinRoomEvent((ClientJoinRoomEvent) (msg.getMsgDTO()), from));
+                break;
         }
         return response;
     }
