@@ -7,7 +7,7 @@ import domain.User;
 
 public class UserManager {
 
-    private final Map<Integer, User> userList = new HashMap<Integer, User>();
+    private final Map<Integer, User> userList = new HashMap<>();
     private int lastID = 0;
 
     public User createUser(String nickName){

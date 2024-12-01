@@ -1,5 +1,6 @@
 package domain;
 
+import exception.ErrorType;
 import exception.GameServerException;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class Room {
     int drawTimeLimit;
     int participantLimit;
     User owner;
-    List<User> userList = new ArrayList<User>();
+    List<User> userList = new ArrayList<>();
     Map<Integer, Boolean> readyStatusMap = new HashMap<>();
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner){
@@ -27,7 +28,8 @@ public class Room {
 
     public void addUser(User user) throws GameServerException {
         if(userList.size() == participantLimit) {
-            throw new GameServerException(String.format("방이 다 찼습니다. (최대 인원: %d명)", participantLimit));
+            throw new GameServerException(ErrorType.ROOM_JOIN_FAILED,
+                    String.format("방이 가득 찼습니다. (최대 인원: %d명)", participantLimit));
         }
         userList.add(user);
         readyStatusMap.put(user.getId(), false);

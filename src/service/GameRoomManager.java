@@ -1,15 +1,14 @@
 package service;
 
+import java.util.HashMap;
 import java.util.Map;
-
 import domain.User;
 import domain.Room;
 import exception.GameServerException;
+import exception.ErrorType;
 
 public class GameRoomManager {
-    static final String ROOM_NOT_FOUND_ERROR = "해당 ID의 방이 존재하지 않습니다.";
-
-    private Map<Integer, Room> gameRoomList;
+    private final Map<Integer, Room> gameRoomList = new HashMap<>();
     private int lastID = 0;
 
     public Room createRoom(int drawTimeLimit, int participantLimit, User creator) throws GameServerException {
@@ -18,20 +17,20 @@ public class GameRoomManager {
             gameRoomList.put(lastID, newRoom);
             return newRoom;
         } catch (Exception e) {
-            throw new GameServerException("방 생성 실패: 시스템 문제", e);
+            throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, e);
         }
     }
 
     public Room getRoom(int roomID) throws GameServerException {
-        if(!gameRoomList.containsKey(roomID)) {
-            throw new GameServerException(ROOM_NOT_FOUND_ERROR);
+        if (!gameRoomList.containsKey(roomID)) {
+            throw new GameServerException(ErrorType.ROOM_NOT_FOUND);
         }
         return gameRoomList.get(roomID);
     }
 
     public void deleteRoom(int roomID) throws GameServerException {
-        if(!gameRoomList.containsKey(roomID)) {
-            throw new GameServerException(ROOM_NOT_FOUND_ERROR);
+        if (!gameRoomList.containsKey(roomID)) {
+            throw new GameServerException(ErrorType.ROOM_NOT_FOUND);
         }
         gameRoomList.remove(roomID);
     }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import static message.MessageType.*;
 
 import domain.User;
+import exception.ErrorType;
 import service.UserManager;
 import service.GameRoomManager;
 import message.handler.MessageHandler;
@@ -51,12 +52,12 @@ public class ClientDispatcher implements Runnable{
     }
 
     private Message getMessageFromClient() throws GameServerException {
-        Message message = null;
+        Message message;
         try {
             message = (Message) fromClient.readObject();
-            System.out.println(message.getType());
+            System.out.println("메세지 수신됨: " + message.getType());
         } catch (IOException | ClassNotFoundException e) {
-            throw new GameServerException("수신 중 오류");
+            throw new GameServerException(ErrorType.MESSAGE_RECEIVE_ERROR);
         }
         return message;
     }
@@ -87,11 +88,11 @@ public class ClientDispatcher implements Runnable{
     }
 
     private User createUser() throws GameServerException {
-        User user = null;
+        User user;
         Message msgFromClient = getMessageFromClient();
 
         if(msgFromClient.getType() != CLIENT_LOGIN_EVENT) {
-            throw new GameServerException("최초 메세지는 로그인 요청이어야 합니다");
+            throw new GameServerException(ErrorType.INVALID_INPUT, "최초 메세지는 로그인 요청이어야 합니다.");
         }
 
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();

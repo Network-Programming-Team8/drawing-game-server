@@ -1,11 +1,20 @@
 package exception;
 
-public class GameServerException extends Exception{
-    public GameServerException(String errorMessage) {
-        super(errorMessage);
+public class GameServerException extends Exception {
+
+    public GameServerException(ErrorType errorType) {
+        super(errorType.toString());
     }
 
-    public GameServerException(String errorMessage, Exception e) {
-        super(errorMessage + "\n error: " + e.getMessage());
+    public GameServerException(ErrorType errorType, String additionalMessage) {
+        super(String.format("%s: %s", errorType.toString(), additionalMessage));
+    }
+
+    public GameServerException(ErrorType errorType, Throwable cause, String additionalMessage) {
+        super(String.format("%s: %s", errorType.toString(), additionalMessage), cause);
+    }
+
+    public GameServerException(ErrorType errorType, Throwable cause) {
+        super(errorType.toString(), cause);
     }
 }

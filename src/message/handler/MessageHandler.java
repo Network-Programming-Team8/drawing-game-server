@@ -4,6 +4,7 @@ import static message.MessageType.*;
 
 import domain.User;
 import domain.Room;
+import exception.ErrorType;
 import mapper.RoomMapper;
 import service.GameRoomManager;
 import message.Message;
@@ -38,7 +39,7 @@ public class MessageHandler {
 
     private Event handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
-            throw new GameServerException("참가자 수와 제한 시간은 양수여야 합니다");
+            throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "참가자 수와 제한 시간은 양수여야 합니다.");
         }
         room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from);
         return new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
