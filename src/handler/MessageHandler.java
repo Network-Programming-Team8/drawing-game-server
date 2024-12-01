@@ -1,4 +1,4 @@
-package message.handler;
+package handler;
 
 import static message.MessageType.*;
 

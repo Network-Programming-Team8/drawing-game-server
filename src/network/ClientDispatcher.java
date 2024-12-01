@@ -11,7 +11,7 @@ import domain.User;
 import exception.ErrorType;
 import service.UserManager;
 import service.GameRoomManager;
-import message.handler.MessageHandler;
+import handler.MessageHandler;
 import message.Message;
 import dto.event.client.ClientLoginEvent;
 import dto.event.server.ServerLoginEvent;
@@ -26,7 +26,7 @@ public class ClientDispatcher implements Runnable{
     private ObjectInputStream fromClient;
     private ObjectOutputStream toClient;
 
-    boolean isConnected = false;
+    private boolean isConnected = false;
 
     public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
         this.userManager = userManager;
