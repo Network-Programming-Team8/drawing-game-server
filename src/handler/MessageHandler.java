@@ -31,7 +31,7 @@ public class MessageHandler {
                         handleCreateRoomEvent((ClientCreateRoomEvent) (msg.getMsgDTO()), from));
 
             case CLIENT_JOIN_ROOM_EVENT:
-                response = new Message(SERVER_JOIN_ROOM_EVENT,
+                response = new Message(SERVER_ROOM_UPDATE_EVENT,
                         handleJoinRoomEvent((ClientJoinRoomEvent) (msg.getMsgDTO()), from));
         }
         return response;
