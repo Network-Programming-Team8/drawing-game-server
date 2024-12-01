@@ -35,6 +35,7 @@ public class ClientDispatcher implements Runnable{
             toClient = new ObjectOutputStream(socket.getOutputStream());
             fromClient = new ObjectInputStream(socket.getInputStream());
             isConnected = true;
+            System.out.println("client connected");
         } catch (Exception ex){
             System.err.println("클라이언트 접속 중 오류");
         }
