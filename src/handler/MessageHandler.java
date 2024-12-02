@@ -108,7 +108,7 @@ public class MessageHandler {
 
     private Event handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
 
-        return null;
+        return new ServerRoomChatMessage(from.getNickname(), request.getMessage());
     }
 
     private Event handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
