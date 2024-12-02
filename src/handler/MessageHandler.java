@@ -5,6 +5,7 @@ import static message.MessageType.*;
 import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
+import mapper.VoteMapper;
 import service.GameRoomManager;
 import message.Message;
 import dto.event.Event;
@@ -127,7 +128,8 @@ public class MessageHandler {
     }
 
     private Event handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
-
-        return null;
+        int votedUser = request.getVoteUser();
+        room.vote(votedUser);
+        return new ServerVoteEvent(VoteMapper.toVoteInfo(room));
     }
 }
