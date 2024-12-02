@@ -15,6 +15,8 @@ import dto.event.server.ServerCreateRoomEvent;
 import dto.event.server.ServerRoomUpdateEvent;
 import exception.GameServerException;
 
+import javax.management.MBeanRegistration;
+
 public class MessageHandler {
     private final GameRoomManager roomManager;
     private Room room = null;
@@ -34,6 +36,30 @@ public class MessageHandler {
             case CLIENT_JOIN_ROOM_EVENT:
                 response = new Message(SERVER_ROOM_UPDATE_EVENT,
                         handleJoinRoomEvent((ClientJoinRoomEvent) (msg.getMsgDTO()), from));
+                break;
+
+            case CLIENT_CHANGE_ROOM_SETTING_EVENT:
+                break;
+
+            case CLIENT_READY_EVENT:
+                break;
+
+            case CLIENT_EXIT_ROOM_EVENT:
+                break;
+
+            case CLIENT_ROOM_CHAT_MESSAGE:
+                break;
+
+            case CLIENT_SUGGEST_TOPIC_EVENT:
+                break;
+
+            case CLIENT_DRAW_EVENT:
+                break;
+
+            case CLIENT_GUESS_EVENT:
+                break;
+
+            case CLIENT_VOTE_EVENT:
                 break;
         }
         return response;
