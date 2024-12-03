@@ -32,7 +32,7 @@ public class ClientDispatcher implements Runnable{
     public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
         this.userManager = userManager;
         sender = new Sender(roomManager, userManager);
-        messageHandler = new MessageHandler(roomManager);
+        messageHandler = new MessageHandler(roomManager, sender);
         try{
             toClient = new ObjectOutputStream(socket.getOutputStream());
             fromClient = new ObjectInputStream(socket.getInputStream());
