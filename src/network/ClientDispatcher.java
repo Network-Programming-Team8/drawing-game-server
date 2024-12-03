@@ -32,7 +32,7 @@ public class ClientDispatcher implements Runnable{
     public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
         this.userManager = userManager;
         sender = new Sender(roomManager, userManager);
-        messageHandler = new MessageHandler(roomManager);
+        messageHandler = new MessageHandler(roomManager, sender);
         try{
             toClient = new ObjectOutputStream(socket.getOutputStream());
             fromClient = new ObjectInputStream(socket.getInputStream());
@@ -65,7 +65,7 @@ public class ClientDispatcher implements Runnable{
         return message;
     }
 
-    private void sendMessageToClient(Message message) {
+    private void sendErrorMessageToClient(Message message) {
         try {
             sender.send(message, toClient);
         } catch (RuntimeException e) {
@@ -79,14 +79,13 @@ public class ClientDispatcher implements Runnable{
         }
         String errorMessage = e.getMessage();
         Message message = new Message(SERVER_ERROR_EVENT, new ServerErrorEvent(errorMessage));
-        sendMessageToClient(message);
+        sendErrorMessageToClient(message);
         System.err.println("에러 메세지 송신됨: " + errorMessage);
     }
 
-    private void receiveAndSendMessageWith(User user) throws GameServerException{
+    private void handleMessageWith(User user) throws GameServerException{
         Message msgFromClient = getMessageFromClient();
-        Message msgToClient = messageHandler.handle(msgFromClient, user);
-        sendMessageToClient(msgToClient);
+        messageHandler.handle(msgFromClient, user);
     }
 
     private User createUser() throws GameServerException {
@@ -102,7 +101,7 @@ public class ClientDispatcher implements Runnable{
         ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
         Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);
-        sendMessageToClient(msgToClient);
+        sendErrorMessageToClient(msgToClient);
 
         return user;
     }
@@ -119,7 +118,7 @@ public class ClientDispatcher implements Runnable{
         }
         while(isConnected){
             try {
-                receiveAndSendMessageWith(user);
+                handleMessageWith(user);
             } catch (GameServerException e) {
                 sendAndLogErrorMessage(e);
             }
