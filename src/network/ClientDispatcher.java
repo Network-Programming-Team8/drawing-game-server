@@ -65,7 +65,7 @@ public class ClientDispatcher implements Runnable{
         return message;
     }
 
-    private void sendErrorMessageToClient(Message message) {
+    private void sendMessageToClient(Message message) {
         try {
             sender.send(message, toClient);
         } catch (RuntimeException e) {
@@ -79,7 +79,7 @@ public class ClientDispatcher implements Runnable{
         }
         String errorMessage = e.getMessage();
         Message message = new Message(SERVER_ERROR_EVENT, new ServerErrorEvent(errorMessage));
-        sendErrorMessageToClient(message);
+        sendMessageToClient(message);
         System.err.println("에러 메세지 송신됨: " + errorMessage);
     }
 
@@ -101,7 +101,7 @@ public class ClientDispatcher implements Runnable{
         ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
         Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);
-        sendErrorMessageToClient(msgToClient);
+        sendMessageToClient(msgToClient);
 
         return user;
     }
