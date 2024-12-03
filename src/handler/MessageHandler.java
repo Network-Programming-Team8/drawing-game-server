@@ -6,6 +6,7 @@ import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
 import service.GameRoomManager;
+import network.Sender;
 import message.Message;
 import dto.event.Event;
 import dto.event.client.*;
@@ -15,18 +16,23 @@ import exception.GameServerException;
 
 public class MessageHandler {
     private final GameRoomManager roomManager;
+    private final Sender sender;
     private Room room = null;
 
-    public MessageHandler(GameRoomManager roomManager){
+    public MessageHandler(GameRoomManager roomManager, Sender sender){
         this.roomManager = roomManager;
+        this.sender = sender;
     }
 
-    public Message handle(Message msg, User from) throws GameServerException {
+    public void handle(Message msg, User from) throws GameServerException {
         Message response = null;
+        boolean isBroadcast = true;
+
         switch(msg.getType()){
             case CLIENT_CREATE_ROOM_EVENT:
                 response = new Message(SERVER_CREATE_ROOM_EVENT,
                         handleCreateRoomEvent((ClientCreateRoomEvent) (msg.getMsgDTO()), from));
+                isBroadcast = false;
                 break;
 
             case CLIENT_JOIN_ROOM_EVENT:
@@ -74,7 +80,15 @@ public class MessageHandler {
                         handleVoteEvent((ClientVoteEvent) (msg.getMsgDTO()), from));
                 break;
         }
-        return response;
+
+        sendMessage(response, from, isBroadcast);
+    }
+
+    private void sendMessage(Message message, User from, boolean isBroadcast) throws GameServerException {
+        if(isBroadcast)
+            sender.sendToAll(message, room.getId());
+        else
+            sender.send(message, from.getId());
     }
 
     private Event handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {

@@ -1,5 +1,6 @@
 package network;
 
+import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
 import service.GameRoomManager;
@@ -16,7 +17,8 @@ public class Sender {
         this.roomManager = roomManager;
         this.userManager = userManager;
     }
-    void send(Message message, ObjectOutputStream os) {
+
+    public void send(Message message, ObjectOutputStream os) {
         try {
             os.writeObject(message);
         } catch (IOException e) {
@@ -24,12 +26,14 @@ public class Sender {
             throw new RuntimeException(e); //아래 send에서도 알아야해서 다른 exception으로 해야 함
         }
     }
-    void send(Message message, int userId) {
+
+    public void send(Message message, int userId) {
         send(message, userManager.getOutputStream(userId));
     }
-    void broadCast(Message message, int roomId) throws GameServerException {
+
+    public void sendToAll(Message message, int roomId) throws GameServerException {
         roomManager.getRoom(roomId).getUserList().forEach(
-                user -> send(message, user.getId())
+            user -> { send(message, user.getId()); }
         );
     }
 }
