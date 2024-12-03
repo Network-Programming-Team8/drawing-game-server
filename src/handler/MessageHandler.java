@@ -7,7 +7,6 @@ import domain.Room;
 import mapper.RoomMapper;
 import mapper.VoteMapper;
 import service.GameRoomManager;
-import network.Sender;
 import message.Message;
 import dto.event.Event;
 import dto.event.client.*;
@@ -17,12 +16,10 @@ import exception.GameServerException;
 
 public class MessageHandler {
     private final GameRoomManager roomManager;
-    private final Sender sender;
     private Room room = null;
 
-    public MessageHandler(GameRoomManager roomManager, Sender sender){
+    public MessageHandler(GameRoomManager roomManager){
         this.roomManager = roomManager;
-        this.sender = sender;
     }
 
     public Message handle(Message msg, User from) throws GameServerException {
