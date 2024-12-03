@@ -22,6 +22,7 @@ import exception.GameServerException;
 public class ClientDispatcher implements Runnable{
     private final UserManager userManager;
     private final MessageHandler messageHandler;
+    private final Sender sender;
 
     private ObjectInputStream fromClient;
     private ObjectOutputStream toClient;
@@ -30,6 +31,7 @@ public class ClientDispatcher implements Runnable{
 
     public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
         this.userManager = userManager;
+        sender = new Sender(roomManager, userManager);
         messageHandler = new MessageHandler(roomManager);
         try{
             toClient = new ObjectOutputStream(socket.getOutputStream());
@@ -65,9 +67,8 @@ public class ClientDispatcher implements Runnable{
 
     private void sendMessageToClient(Message message) {
         try {
-            toClient.writeObject(message);
-        } catch (IOException e) {
-            System.err.println("송신 중 오류: 클라이언트 연결을 종료합니다.");
+            sender.send(message, toClient);
+        } catch (RuntimeException e) {
             closeConnection();
         }
     }
@@ -97,7 +98,7 @@ public class ClientDispatcher implements Runnable{
         }
 
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();
-        user = userManager.createUser(clientLoginEvent.getNickName());
+        user = userManager.createUser(clientLoginEvent.getNickName(), toClient);
         ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
         Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);
