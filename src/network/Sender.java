@@ -1,39 +1,44 @@
 package network;
 
+import exception.ConnectionError;
 import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
-import service.GameRoomManager;
-import service.UserManager;
+import manager.GameRoomManager;
+import manager.ConnectionManager;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 public class Sender {
-    private final GameRoomManager roomManager;
-    private final UserManager userManager;
+    private final ConnectionManager connectionManager;
 
-    public Sender(GameRoomManager roomManager, UserManager userManager) {
-        this.roomManager = roomManager;
-        this.userManager = userManager;
+    public Sender(ConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
 
-    public void send(Message message, ObjectOutputStream os) {
-        try {
-            os.writeObject(message);
-        } catch (IOException e) {
-            System.err.println("송신 중 오류 발생");
-            throw new RuntimeException(e); //아래 send에서도 알아야해서 다른 exception으로 해야 함
+    public void send(Message message, ObjectOutputStream os) throws ConnectionError {
+        synchronized (os) { // ObjectOutputStream에 동기화 적용
+            try {
+                os.writeObject(message);
+            } catch (IOException e) {
+                throw new ConnectionError(ErrorType.MESSAGE_SEND_ERROR);
+            }
         }
     }
 
-    public void send(Message message, int userId) {
-        send(message, userManager.getOutputStream(userId));
+    public void send(Message message, int id) {
+        ObjectOutputStream os = connectionManager.getOutputStream(id);
+        try {
+            send(message, os);
+        } catch (ConnectionError e) {
+            System.err.println("메시지 송신 불가: 클라이언트와 연결이 끊어졌습니다.");
+            connectionManager.closeConnection(id);
+        }
     }
 
-    public void sendToAll(Message message, int roomId) throws GameServerException {
-        roomManager.getRoom(roomId).getUserList().forEach(
-            user -> { send(message, user.getId()); }
-        );
+    public void sendToAll(Message message, List<Integer> idList) throws GameServerException {
+        idList.forEach(id -> {send(message, id);});
     }
 }

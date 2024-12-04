@@ -1,8 +1,12 @@
 package dto.info;
 
+import java.io.Serial;
 import java.util.List;
 
-public class RoomInfo {
+public class RoomInfo implements Info {
+
+    @Serial
+    private static final long serialVersionUID = 4138183250339217845L;
     private final int id;
     private final int drawTimeLimit;
     private final int participantLimit;
