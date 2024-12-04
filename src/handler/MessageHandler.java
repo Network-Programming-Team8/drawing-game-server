@@ -5,8 +5,7 @@ import static message.MessageType.*;
 import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
-import mapper.VoteMapper;
-import service.GameRoomManager;
+import manager.GameRoomManager;
 import network.Sender;
 import message.Message;
 import dto.event.Event;
@@ -18,7 +17,6 @@ import exception.GameServerException;
 public class MessageHandler {
     private final GameRoomManager roomManager;
     private final Sender sender;
-    private Room room = null;
 
     public MessageHandler(GameRoomManager roomManager, Sender sender){
         this.roomManager = roomManager;
@@ -26,128 +24,107 @@ public class MessageHandler {
     }
 
     public void handle(Message msg, User from) throws GameServerException {
-        Message response = null;
-        boolean isBroadcast = true;
-
         switch(msg.getType()){
             case CLIENT_CREATE_ROOM_EVENT:
-                response = new Message(SERVER_CREATE_ROOM_EVENT,
-                        handleCreateRoomEvent((ClientCreateRoomEvent) (msg.getMsgDTO()), from));
-                isBroadcast = false;
+                handleCreateRoomEvent((ClientCreateRoomEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_JOIN_ROOM_EVENT:
-                response = new Message(SERVER_ROOM_UPDATE_EVENT,
-                        handleJoinRoomEvent((ClientJoinRoomEvent) (msg.getMsgDTO()), from));
+                handleJoinRoomEvent((ClientJoinRoomEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_CHANGE_ROOM_SETTING_EVENT:
-                response = new Message(SERVER_ROOM_UPDATE_EVENT,
-                        handleChangeRoomEvent((ClientChangeRoomSettingEvent) (msg.getMsgDTO()), from));
+                handleChangeRoomEvent((ClientChangeRoomSettingEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_READY_EVENT:
-                response = new Message(SERVER_ROOM_UPDATE_EVENT,
-                        handleReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from));
+                handleReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_EXIT_ROOM_EVENT:
-                response = new Message(SERVER_ROOM_UPDATE_EVENT,
-                        handleExitRoomEvent((ClientExitRoomEvent) (msg.getMsgDTO()), from));
+                handleExitRoomEvent((ClientExitRoomEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_ROOM_CHAT_MESSAGE:
-                response = new Message(SERVER_ROOM_CHAT_MESSAGE,
-                        handleRoomChatMessage((ClientRoomChatMessage) (msg.getMsgDTO()), from));
+                handleRoomChatMessage((ClientRoomChatMessage) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_SUGGEST_TOPIC_EVENT:
-                response = new Message(SERVER_START_GAME_EVENT,
-                        handleSuggestTopicEvent((ClientSuggestTopicEvent) (msg.getMsgDTO()), from));
+                handleSuggestTopicEvent((ClientSuggestTopicEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_DRAW_EVENT:
-                response = new Message(SERVER_DRAW_EVENT,
-                        handleDrawEvent((ClientDrawEvent) (msg.getMsgDTO()), from));
+                handleDrawEvent((ClientDrawEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_GUESS_EVENT:
-                response = new Message(SERVER_FINISH_GAME_EVENT,
-                        handleGuessEvent((ClientGuessEvent) (msg.getMsgDTO()), from));
+                handleGuessEvent((ClientGuessEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_VOTE_EVENT:
-                if(!room.getIsVoteEnd())
-                    response = new Message(SERVER_VOTE_EVENT,
-                            handleVoteEvent((ClientVoteEvent) (msg.getMsgDTO()), from));
-                else
-                    response = new Message(SERVER_ERROR_EVENT,
-                            new ServerErrorEvent("투표 불가: 투표가 이미 마감되었습니다."));
+                handleVoteEvent((ClientVoteEvent) (msg.getMsgDTO()), from);
                 break;
         }
-
-        sendMessage(response, from, isBroadcast);
     }
 
-    private void sendMessage(Message message, User from, boolean isBroadcast) throws GameServerException {
-        if(isBroadcast)
-            sender.sendToAll(message, room.getId());
-        else
-            sender.send(message, from.getId());
+    private void sendTo(Message message, User to) {
+        sender.send(message, to.getId());
     }
 
-    private Event handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {
+    private void broadcastIn(Message message, Room room) throws GameServerException {
+        sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
+    }
+
+    private void handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
             throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "참가자 수와 제한 시간은 양수여야 합니다.");
         }
-        room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from);
-        return new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
+        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from);
+        Event event = new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
+        Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
+        sendTo(message, from);
     }
 
-    private Event handleJoinRoomEvent(ClientJoinRoomEvent request, User from) throws GameServerException {
-        room = roomManager.getRoom(request.getRoomID());
+    private void handleJoinRoomEvent(ClientJoinRoomEvent request, User from) throws GameServerException {
+        Room room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        return new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
+        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
+        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
+        broadcastIn(message, room);
     }
 
-    private Event handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
+    private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
 
-        return null;
     }
 
-    private Event handleReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
+    private void handleReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
 
-        return null;
     }
 
-    private Event handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
+    private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
 
-        return null;
     }
 
-    private Event handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
-
-        return null;
+    private void handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
+        Room room = roomManager.getRoom(from.getRoomID());
+        Event event = new ServerRoomChatMessage(from.getNickname(), request.getMessage());
+        Message message = new Message(SERVER_ROOM_CHAT_MESSAGE, event);
+        broadcastIn(message, room);
     }
 
-    private Event handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
+    private void handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
 
-        return null;
     }
 
-    private Event handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
+    private void handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
 
-        return null;
     }
 
-    private Event handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {
+    private void handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {
 
-        return null;
     }
 
-    private Event handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
-        int votedUser = request.getVoteUser();
-        room.vote(votedUser);
-        return new ServerVoteEvent(VoteMapper.toVoteInfo(room));
+    private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
+
     }
 }

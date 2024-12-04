@@ -1,16 +1,12 @@
 package network;
 
-import java.net.Socket;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
 
 import static message.MessageType.*;
 
 import domain.User;
 import exception.ErrorType;
-import service.UserManager;
-import service.GameRoomManager;
+import manager.ConnectionManager;
 import handler.MessageHandler;
 import message.Message;
 import dto.event.client.ClientLoginEvent;
@@ -19,45 +15,27 @@ import dto.event.server.ServerErrorEvent;
 import exception.GameServerException;
 
 
-public class ClientDispatcher implements Runnable{
-    private final UserManager userManager;
+public class ConnectionRunner implements Runnable{
+    private final ConnectionManager connectionManager;
     private final MessageHandler messageHandler;
     private final Sender sender;
+    private final int id;
 
-    private ObjectInputStream fromClient;
-    private ObjectOutputStream toClient;
-
-    private boolean isConnected = false;
-
-    public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
-        this.userManager = userManager;
-        sender = new Sender(roomManager, userManager);
-        messageHandler = new MessageHandler(roomManager, sender);
-        try{
-            toClient = new ObjectOutputStream(socket.getOutputStream());
-            fromClient = new ObjectInputStream(socket.getInputStream());
-            isConnected = true;
-            System.out.println("client connected");
-        } catch (Exception ex){
-            System.err.println("클라이언트 접속 중 오류");
-        }
+    public ConnectionRunner(int id, ConnectionManager connectionManager, Sender sender, MessageHandler messageHandler){
+        this.connectionManager = connectionManager;
+        this.sender = sender;
+        this.messageHandler = messageHandler;
+        this.id = id;
     }
 
     private void closeConnection() {
-        try {
-            if (fromClient != null) fromClient.close();
-            if (toClient != null) toClient.close();
-        } catch (IOException e) {
-            System.err.println("연결 종료 중 오류 발생: " + e.getMessage());
-        }
-        isConnected = false;
-        System.out.println("클라이언트 연결 종료");
+        connectionManager.closeConnection(id);
     }
 
     private Message getMessageFromClient() throws GameServerException {
         Message message;
         try {
-            message = (Message) fromClient.readObject();
+            message = (Message) connectionManager.getInputStream(id).readObject();
             System.out.println("메세지 수신됨: " + message.getType());
         } catch (IOException | ClassNotFoundException e) {
             throw new GameServerException(ErrorType.MESSAGE_RECEIVE_ERROR);
@@ -66,17 +44,10 @@ public class ClientDispatcher implements Runnable{
     }
 
     private void sendMessageToClient(Message message) {
-        try {
-            sender.send(message, toClient);
-        } catch (RuntimeException e) {
-            closeConnection();
-        }
+        sender.send(message, id);
     }
 
     private void sendAndLogErrorMessage(Exception e) {
-        if (!isConnected) {
-            System.err.println("에러 메시지 송신 불가: 클라이언트와 연결이 끊어졌습니다.");
-        }
         String errorMessage = e.getMessage();
         Message message = new Message(SERVER_ERROR_EVENT, new ServerErrorEvent(errorMessage));
         sendMessageToClient(message);
@@ -88,8 +59,7 @@ public class ClientDispatcher implements Runnable{
         messageHandler.handle(msgFromClient, user);
     }
 
-    private User createUser() throws GameServerException {
-        User user;
+    private void register() throws GameServerException {
         Message msgFromClient = getMessageFromClient();
 
         if(msgFromClient.getType() != CLIENT_LOGIN_EVENT) {
@@ -97,33 +67,31 @@ public class ClientDispatcher implements Runnable{
         }
 
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();
-        user = userManager.createUser(clientLoginEvent.getNickName(), toClient);
+
+        User user = new User(id, clientLoginEvent.getNickName());
+        connectionManager.registerUserTo(user, id);
         ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
         Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);
         sendMessageToClient(msgToClient);
-
-        return user;
     }
 
     @Override
     public void run(){
-        User user = null;
-        while(user == null && isConnected) {
+        while(connectionManager.hasConnection(id) && !connectionManager.hasUser(id)) {
             try {
-                user = createUser();
+                register();
             } catch (GameServerException e) {
                 sendAndLogErrorMessage(e);
             }
         }
-        while(isConnected){
+        while(connectionManager.hasConnection(id)){
             try {
-                handleMessageWith(user);
+                handleMessageWith(connectionManager.getUser(id));
             } catch (GameServerException e) {
                 sendAndLogErrorMessage(e);
             }
         }
-
         closeConnection();
     }
 }

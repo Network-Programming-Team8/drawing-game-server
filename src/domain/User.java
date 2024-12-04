@@ -4,6 +4,7 @@ public class User {
 
     private final int id;
     private final String nickname;
+    private int roomID;
 
     public User(int id, String nickname){
         this.id = id;
@@ -16,4 +17,5 @@ public class User {
     public String getNickname() {
         return nickname;
     }
+    public int getRoomID() { return roomID; }
 }

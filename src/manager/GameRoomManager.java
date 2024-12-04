@@ -1,14 +1,14 @@
-package service;
+package manager;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import domain.User;
 import domain.Room;
 import exception.GameServerException;
 import exception.ErrorType;
 
 public class GameRoomManager {
-    private final Map<Integer, Room> gameRoomList = new HashMap<>();
+    private final Map<Integer, Room> gameRoomList = new ConcurrentHashMap<>();
     private int lastID = 0;
 
     public Room createRoom(int drawTimeLimit, int participantLimit, User creator) throws GameServerException {

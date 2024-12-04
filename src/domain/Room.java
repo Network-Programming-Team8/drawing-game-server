@@ -4,9 +4,9 @@ import exception.ErrorType;
 import exception.GameServerException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
 
@@ -15,10 +15,7 @@ public class Room {
     int participantLimit;
     private User owner;
     private final List<User> userList = new ArrayList<>();
-    private final Map<Integer, Boolean> readyStatusMap = new HashMap<>();
-    private final Map<Integer, Integer> voteCounter = new HashMap<>();
-    private boolean isGameEnd;
-    private boolean isVoteEnd;
+    private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner){
         this.id = id;
@@ -27,8 +24,6 @@ public class Room {
         this.owner = owner;
         userList.add(owner);
         readyStatusMap.put(owner.getId(), false);
-        this.isGameEnd = false;
-        this.isVoteEnd = false;
     }
 
     public void addUser(User user) throws GameServerException {
@@ -38,17 +33,6 @@ public class Room {
         }
         userList.add(user);
         readyStatusMap.put(user.getId(), false);
-    }
-
-    public void vote(int id) {
-        if(voteCounter.containsKey(id)){
-            int numOfVote = voteCounter.get(id);
-            voteCounter.remove(id);
-            voteCounter.put(id, numOfVote+1);
-        }
-        else{
-            voteCounter.put(id, 1);
-        }
     }
 
     public int getId() {
@@ -70,12 +54,4 @@ public class Room {
     public boolean isReady(int userId) {
         return readyStatusMap.get(userId);
     }
-
-    public boolean getIsGameEnd() { return isGameEnd; }
-
-    public void setIsVoteEnd() { isVoteEnd = true; }
-
-    public boolean getIsVoteEnd() { return isVoteEnd; }
-
-    public Map<Integer, Integer> getVoteState(){ return voteCounter; }
 }

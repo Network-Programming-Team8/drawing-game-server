@@ -9,7 +9,10 @@ public enum ErrorType {
 
     // **Connection Errors**
     CLIENT_DISCONNECTED("E100", "클라이언트가 연결을 종료했습니다."),
-    MESSAGE_RECEIVE_ERROR("E101", "메시지 수신 중 오류가 발생했습니다."),
+    MESSAGE_SEND_ERROR("E101", "메세지 송신 중 오류가 발생했습니다."),
+    MESSAGE_RECEIVE_ERROR("E102", "메시지 수신 중 오류가 발생했습니다."),
+    CONNECTION_NOT_FOUND("E103", "연결을 찾을 수 없습니다."),
+    FAILED_TO_CONNECT("E104", "연결에 실패했습니다."),
 
     // **Room Errors**
     ROOM_NOT_FOUND("E200", "해당 ID의 방이 존재하지 않습니다."),
@@ -24,7 +27,7 @@ public enum ErrorType {
     // **Game Errors**
     GAME_START_FAILED("E400", "게임을 시작하는 데 실패했습니다."),
     GAME_ACTION_INVALID("E401", "잘못된 게임 액션입니다."),
-    GAME_ROOM_STATE_INVALID("E402", "게임 방 상태가 유효하지 않습니다.");
+    GAME_ROOM_STATE_INVALID("E402", "게임 방 상태가 유효하지 않습니다."),;
 
     private final String errorCode;
     private final String errorMessage;
