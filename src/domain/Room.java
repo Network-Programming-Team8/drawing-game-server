@@ -76,4 +76,8 @@ public class Room {
     public boolean isReady(int userId) {
         return readyStatusMap.get(userId);
     }
+
+    public void setReady(int userId, boolean ready) {
+        readyStatusMap.put(userId, ready);
+    }
 }

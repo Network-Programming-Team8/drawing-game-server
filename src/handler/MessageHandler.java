@@ -98,7 +98,9 @@ public class MessageHandler {
     }
 
     private void handleReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.setReady(from.getId(), request.getIsReady());
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
