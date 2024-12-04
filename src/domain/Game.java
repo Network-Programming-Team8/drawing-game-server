@@ -7,7 +7,7 @@ import message.Message;
 
 import java.util.List;
 
-import static message.MessageType.SERVER_ROOM_UPDATE_EVENT;
+import static message.MessageType.SERVER_START_GAME_EVENT;
 
 public class Game {
     private final Room room;
@@ -28,7 +28,7 @@ public class Game {
 
     private void broadCastGameStartEvent() throws GameServerException {
         Event event = new ServerStartGameEvent(topic, guesserId, order);
-        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
+        Message message = new Message(SERVER_START_GAME_EVENT, event);
         room.broadcast(message);
     }
 }
