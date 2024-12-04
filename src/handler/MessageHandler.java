@@ -104,7 +104,9 @@ public class MessageHandler {
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.deleteUser(from.getId());
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
