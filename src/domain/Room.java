@@ -4,9 +4,9 @@ import exception.ErrorType;
 import exception.GameServerException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
 
@@ -15,7 +15,7 @@ public class Room {
     int participantLimit;
     private User owner;
     private final List<User> userList = new ArrayList<>();
-    private final Map<Integer, Boolean> readyStatusMap = new HashMap<>();
+    private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner){
         this.id = id;
