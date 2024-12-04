@@ -16,12 +16,16 @@ public class Connection {
         this.is = is;
     }
 
+    public boolean hasUser() {
+        return user != null;
+    }
+
     public void registerUser(User user) {
         this.user = user;
     }
 
     public User getUser() throws GameServerException {
-        if(user == null) {
+        if(!hasUser()) {
             throw new GameServerException(ErrorType.UNKNOWN_ERROR);
         }
         return user;
