@@ -31,8 +31,8 @@ public class ConnectionListener {
             while(true){
                 Socket socket = server.accept();
                 int connectionId = connect(socket);
-                Thread connection = new Thread(new ConnectionRunner(connectionId, connectionManager, sender, messageHandler));
-                connection.start();
+                Thread connectionThread = new Thread(new ConnectionRunner(connectionId, connectionManager, sender, messageHandler));
+                connectionThread.start();
             }
         } catch (Exception ex){
             System.err.println("서버 소켓 생성 및 클라이언트의 접속 대기 중 오류");
@@ -40,7 +40,7 @@ public class ConnectionListener {
     }
 
     private int connect(Socket socket) throws ConnectionError {
-        try {
+        try { //TODO 동시성문제?
             ObjectOutputStream toClient = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream fromClient = new ObjectInputStream(socket.getInputStream());
             return connectionManager.addConnection(toClient, fromClient);
