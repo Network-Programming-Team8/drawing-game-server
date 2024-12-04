@@ -2,17 +2,16 @@ package manager;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import domain.Connection;
 import domain.User;
-import exception.ErrorType;
 import exception.GameServerException;
 
 public class ConnectionManager {
 
-    private Map<Integer, Connection> connectionMap = new HashMap<>();
+    private Map<Integer, Connection> connectionMap = new ConcurrentHashMap<>();
     private int lastID = 0;
 
     private Connection getConnection (int id) {
