@@ -9,12 +9,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
-
     private final int id;
     private final int drawTimeLimit;
     int participantLimit;
     private User owner;
-    private final List<User> userList = new ArrayList<>();
+    private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner){
@@ -22,17 +21,32 @@ public class Room {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
         this.owner = owner;
-        userList.add(owner);
+        userMap.put(owner.getId(), owner);
         readyStatusMap.put(owner.getId(), false);
     }
 
     public void addUser(User user) throws GameServerException {
-        if(userList.size() == participantLimit) {
+        if(userMap.size() == participantLimit) {
             throw new GameServerException(ErrorType.ROOM_JOIN_FAILED,
                     String.format("방이 가득 찼습니다. (최대 인원: %d명)", participantLimit));
         }
-        userList.add(user);
+        userMap.put(user.getId(), user);
         readyStatusMap.put(user.getId(), false);
+        user.joinRoom(id);
+    }
+
+    public boolean isThereUser(int userId) {
+        return userMap.containsKey(userId);
+    }
+
+    public void deleteUser(int userId) throws GameServerException {
+        if (!isThereUser(userId)) {
+            throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+        }
+        User user = userMap.get(userId);
+        user.leaveRoom();
+        userMap.remove(userId);
+        readyStatusMap.remove(userId);
     }
 
     public int getId() {
@@ -47,8 +61,12 @@ public class Room {
         return participantLimit;
     }
 
+    public List<Integer> getUserIdList() {
+        return new ArrayList<>(userMap.keySet());
+    }
+
     public List<User> getUserList() {
-        return userList;
+        return userMap.values().stream().toList();
     }
 
     public boolean isReady(int userId) {
