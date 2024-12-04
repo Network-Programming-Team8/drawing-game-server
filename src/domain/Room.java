@@ -15,10 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static message.MessageType.SERVER_ROOM_UPDATE_EVENT;
 
-import exception.ErrorType;
-import exception.GameServerException;
-import network.Sender;
-
 public class Room {
     private final int id;
     private int drawTimeLimit;
