@@ -20,7 +20,9 @@ public class Room {
     private int drawTimeLimit;
     private int participantLimit;
     private User owner;
+    private Vote vote;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
+    private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
     private final Sender sender;
     private final GameSetter gameSetter = new GameSetter(this);
@@ -37,6 +39,9 @@ public class Room {
     public void changeSettings(int drawTimeLimit, int participantLimit) {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
+        this.vote = new Vote(this, sender);
+        userList.add(owner);
+        readyStatusMap.put(owner.getId(), false);
     }
 
     public void addUser(User user) throws GameServerException {
@@ -120,4 +125,12 @@ public class Room {
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
         broadcast(message);
     }
+
+    public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
+
+    public void vote(int votedUserID) { vote.vote(votedUserID); }
+
+    public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
+
+    public boolean isVoteEnd() { return vote.isVoteEnd(); }
 }

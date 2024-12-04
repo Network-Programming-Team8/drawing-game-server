@@ -6,6 +6,7 @@ import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
 import manager.GameRoomManager;
+import mapper.VoteMapper;
 import network.Sender;
 import message.Message;
 import dto.event.Event;
@@ -130,7 +131,22 @@ public class MessageHandler {
     }
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
+        Room room = roomManager.getRoom(from.getRoomID());
+        Event event;
+        Message message;
 
+        if(room.isVoteEnd()){
+            event = new ServerErrorEvent("투표 불가: 투표가 이미 종료되었습니다.");
+            message = new Message(SERVER_ERROR_EVENT, event);
+            sendTo(message, from);
+        }
+        else{
+            int votedUser = request.getVoteUser();
+            room.vote(votedUser);
+            event = new ServerVoteEvent(VoteMapper.toVoteInfo(room));
+            message = new Message(SERVER_VOTE_EVENT, event);
+            broadcastIn(message, room);
+        }
     }
 
     private void broadCastRoomUpdateEvent(Room room) throws GameServerException {

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import domain.User;
 import domain.Room;
+import domain.Vote;
 import exception.GameServerException;
 import exception.ErrorType;
 import network.Sender;
