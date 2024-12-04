@@ -1,10 +1,9 @@
 package network;
 
-import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
-import service.GameRoomManager;
-import service.UserManager;
+import manager.GameRoomManager;
+import manager.UserManager;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

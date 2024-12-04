@@ -1,7 +1,7 @@
 package network;
 
-import service.GameRoomManager;
-import service.UserManager;
+import manager.GameRoomManager;
+import manager.UserManager;
 
 import java.net.ServerSocket;
 import java.net.Socket;

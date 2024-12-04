@@ -5,7 +5,7 @@ import static message.MessageType.*;
 import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
-import service.GameRoomManager;
+import manager.GameRoomManager;
 import network.Sender;
 import message.Message;
 import dto.event.Event;

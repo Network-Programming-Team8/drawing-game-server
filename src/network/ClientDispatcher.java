@@ -9,8 +9,8 @@ import static message.MessageType.*;
 
 import domain.User;
 import exception.ErrorType;
-import service.UserManager;
-import service.GameRoomManager;
+import manager.UserManager;
+import manager.GameRoomManager;
 import handler.MessageHandler;
 import message.Message;
 import dto.event.client.ClientLoginEvent;
