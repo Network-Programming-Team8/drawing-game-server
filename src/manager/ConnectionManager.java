@@ -11,8 +11,13 @@ import exception.GameServerException;
 
 public class ConnectionManager {
 
-    private Map<Integer, Connection> connectionMap = new ConcurrentHashMap<>();
+    private final GameRoomManager gameRoomManager;
+    private final Map<Integer, Connection> connectionMap = new ConcurrentHashMap<>();
     private int lastID = 0;
+
+    public ConnectionManager(GameRoomManager gameRoomManager) {
+        this.gameRoomManager = gameRoomManager;
+    }
 
     private Connection getConnection (int id) {
         if(!hasConnection(id)) {
@@ -51,7 +56,17 @@ public class ConnectionManager {
     }
 
     public void closeConnection (int id) {
-        getConnection(id).close();
-        connectionMap.remove(id);
+        try {
+            if(hasConnection(id) && hasUser(id)) {
+                User user = getUser(id);
+                if(user.isInRoom()) {
+                    gameRoomManager.deleteUserFrom(id, user.getRoomID());
+                }
+            }
+            getConnection(id).close();
+            connectionMap.remove(id);
+        } catch (GameServerException e) {
+            System.err.println("연결 종료 중 에러 발생");
+        }
     }
 }

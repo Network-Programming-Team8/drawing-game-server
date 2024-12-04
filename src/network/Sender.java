@@ -35,9 +35,10 @@ public class Sender {
             System.err.println("메시지 송신 불가: 클라이언트와 연결이 끊어졌습니다.");
             connectionManager.closeConnection(id);
         }
+        System.out.printf("sent to %d: %s%n", id, message.getType());
     }
 
-    public void sendToAll(Message message, List<Integer> idList) throws GameServerException {
+    public void sendToAll(Message message, List<Integer> idList) {
         idList.forEach(id -> {send(message, id);});
     }
 }

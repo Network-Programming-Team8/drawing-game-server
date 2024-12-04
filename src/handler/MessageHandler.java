@@ -79,7 +79,7 @@ public class MessageHandler {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
             throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "참가자 수와 제한 시간은 양수여야 합니다.");
         }
-        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from);
+        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from, sender);
         Event event = new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
         Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
         sendTo(message, from);
@@ -88,21 +88,25 @@ public class MessageHandler {
     private void handleJoinRoomEvent(ClientJoinRoomEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
-        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
-        broadcastIn(message, room);
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.changeSettings(request.getDrawTimeLimit(), request.getParticipantLimit());
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.setReady(from.getId(), request.getIsReady());
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        roomManager.deleteUserFrom(from.getId(), from.getRoomID());
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
@@ -126,5 +130,11 @@ public class MessageHandler {
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
 
+    }
+
+    private void broadCastRoomUpdateEvent(Room room) throws GameServerException {
+        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
+        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
+        broadcastIn(message, room);
     }
 }
