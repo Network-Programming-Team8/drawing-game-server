@@ -4,7 +4,6 @@ import exception.ConnectionError;
 import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
-import manager.GameRoomManager;
 import manager.ConnectionManager;
 
 import java.io.IOException;

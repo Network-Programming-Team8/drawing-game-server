@@ -1,14 +1,10 @@
 package network;
 
-import java.net.Socket;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.IOException;
 
 import static message.MessageType.*;
 
 import domain.User;
-import exception.ConnectionError;
 import exception.ErrorType;
 import manager.ConnectionManager;
 import handler.MessageHandler;
