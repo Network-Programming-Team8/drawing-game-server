@@ -58,6 +58,8 @@ public class Room {
 
     public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
 
+    public void vote(int votedUserID) { vote.vote(votedUserID); }
+
     public Map<Integer, Integer> getVoteState() { return vote.getVoteState(); }
 
     public boolean isVoteEnd() { return vote.isVoteEnd(); }

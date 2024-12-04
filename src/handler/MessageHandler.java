@@ -136,6 +136,8 @@ public class MessageHandler {
             sendTo(message, from);
         }
         else{
+            int votedUser = request.getVoteUser();
+            room.vote(votedUser);
             event = new ServerVoteEvent(VoteMapper.toVoteInfo(room));
             message = new Message(SERVER_VOTE_EVENT, event);
             broadcastIn(message, room);
