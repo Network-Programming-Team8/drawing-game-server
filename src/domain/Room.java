@@ -112,12 +112,12 @@ public class Room {
     private void sendTo(Message message, User to) {
         sender.send(message, to.getId());
     }
-    void broadcastIn(Message message) throws GameServerException {
+    void broadcast(Message message) throws GameServerException {
         sender.sendToAll(message, this.getUserList().stream().map(User::getId).toList());
     }
     private void broadCastRoomUpdateEvent() throws GameServerException {
         Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(this));
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
-        broadcastIn(message);
+        broadcast(message);
     }
 }
