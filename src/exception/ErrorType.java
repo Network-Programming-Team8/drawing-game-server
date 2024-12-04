@@ -23,6 +23,7 @@ public enum ErrorType {
     USER_CREATION_FAILED("E300", "유저 생성에 실패했습니다."),
     USER_NOT_FOUND("E301", "해당 유저를 찾을 수 없습니다."),
     USER_ALREADY_IN_ROOM("E302", "유저가 이미 방에 참가해 있습니다."),
+    USER_IS_NOT_IN_ROOM("E303", "유저가 게임 룸 안에 없습니다."),
 
     // **Game Errors**
     GAME_START_FAILED("E400", "게임을 시작하는 데 실패했습니다."),
