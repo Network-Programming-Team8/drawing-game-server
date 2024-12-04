@@ -77,8 +77,12 @@ public class MessageHandler {
                 break;
 
             case CLIENT_VOTE_EVENT:
-                response = new Message(SERVER_VOTE_EVENT,
-                        handleVoteEvent((ClientVoteEvent) (msg.getMsgDTO()), from));
+                if(!room.getIsVoteEnd())
+                    response = new Message(SERVER_VOTE_EVENT,
+                            handleVoteEvent((ClientVoteEvent) (msg.getMsgDTO()), from));
+                else
+                    response = new Message(SERVER_ERROR_EVENT,
+                            new ServerErrorEvent("투표 불가: 투표가 이미 마감되었습니다."));
                 break;
         }
 

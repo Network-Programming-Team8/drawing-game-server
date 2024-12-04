@@ -15,6 +15,7 @@ public class GameRoomManager {
         try {
             Room newRoom = new Room(++lastID, drawTimeLimit, participantLimit, creator);
             gameRoomList.put(lastID, newRoom);
+            Thread voteManager = new Thread(new VoteManager(this, newRoom.getId()));
             return newRoom;
         } catch (Exception e) {
             throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, e);
