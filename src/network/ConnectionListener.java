@@ -8,8 +8,8 @@ import java.net.Socket;
 
 public class ConnectionListener {
 
-    private GameRoomManager roomManager = null;
-    private ConnectionManager connectionManager = null;
+    private final GameRoomManager roomManager;
+    private final ConnectionManager connectionManager;
 
     public ConnectionListener(GameRoomManager roomManager, ConnectionManager connectionManager){
         this.roomManager = roomManager;
@@ -21,8 +21,8 @@ public class ConnectionListener {
             ServerSocket server = new ServerSocket(10001);
             System.out.println("Created Server Socket at port 10001");
             while(true){
-
                 Socket socket = server.accept();
+
                 Thread connection = new Thread(new ClientDispatcher(socket, roomManager, connectionManager));
                 connection.start();
             }

@@ -1,5 +1,7 @@
 package network;
 
+import exception.ConnectionError;
+import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
 import manager.GameRoomManager;
@@ -21,13 +23,12 @@ public class Sender {
         try {
             os.writeObject(message);
         } catch (IOException e) {
-            System.err.println("송신 중 오류 발생");
-            throw new RuntimeException(e); //아래 send에서도 알아야해서 다른 exception으로 해야 함
+            System.err.println("송신 중 오류 발생"); //아래 send에서도 알아야해서 다른 exception으로 해야 함
         }
     }
 
-    public void send(Message message, int userId) {
-        send(message, connectionManager.getOutputStream(userId));
+    public void send(Message message, int id) {
+        send(message, connectionManager.getOutputStream(id));
     }
 
     public void sendToAll(Message message, int roomId) throws GameServerException {

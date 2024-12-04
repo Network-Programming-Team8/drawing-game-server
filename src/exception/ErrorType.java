@@ -10,6 +10,7 @@ public enum ErrorType {
     // **Connection Errors**
     CLIENT_DISCONNECTED("E100", "클라이언트가 연결을 종료했습니다."),
     MESSAGE_RECEIVE_ERROR("E101", "메시지 수신 중 오류가 발생했습니다."),
+    CONNECTION_NOT_FOUND("E102", "연결을 찾을 수 없습니다."),
 
     // **Room Errors**
     ROOM_NOT_FOUND("E200", "해당 ID의 방이 존재하지 않습니다."),

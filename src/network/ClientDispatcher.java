@@ -28,16 +28,18 @@ public class ClientDispatcher implements Runnable{
     private ObjectOutputStream toClient;
 
     private boolean isConnected = false;
+    private int id; //TODO 여기서 관리해도 되는지 고민해보기
 
     public ClientDispatcher(Socket socket, GameRoomManager roomManager, ConnectionManager connectionManager){
         this.connectionManager = connectionManager;
-        sender = new Sender(roomManager, connectionManager);
-        messageHandler = new MessageHandler(roomManager, sender);
+        sender = new Sender(roomManager, connectionManager); //TODO Sender는 state가 있는지? 공유하면 안되는지 확인
+        messageHandler = new MessageHandler(roomManager, sender); //TODO Sender와 마찬가지
         try{
             toClient = new ObjectOutputStream(socket.getOutputStream());
             fromClient = new ObjectInputStream(socket.getInputStream());
             isConnected = true;
             System.out.println("client connected");
+            id = connectionManager.addConnection(toClient, fromClient);
         } catch (Exception ex){
             System.err.println("클라이언트 접속 중 오류");
         }
@@ -89,7 +91,6 @@ public class ClientDispatcher implements Runnable{
     }
 
     private User createUser() throws GameServerException {
-        User user;
         Message msgFromClient = getMessageFromClient();
 
         if(msgFromClient.getType() != CLIENT_LOGIN_EVENT) {
@@ -97,7 +98,9 @@ public class ClientDispatcher implements Runnable{
         }
 
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();
-        user = connectionManager.createUser(clientLoginEvent.getNickName(), toClient);
+
+        User user = new User(id, clientLoginEvent.getNickName());
+        connectionManager.registerUserTo(user, id);
         ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
         Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);
