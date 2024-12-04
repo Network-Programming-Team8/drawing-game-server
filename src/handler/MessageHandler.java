@@ -25,6 +25,9 @@ public class MessageHandler {
     }
 
     public void handle(Message msg, User from) throws GameServerException {
+        if(msg.getMsgDTO() == null) {
+            throw new GameServerException(ErrorType.EVENT_IS_NULL);
+        }
         switch(msg.getType()){
             case CLIENT_CREATE_ROOM_EVENT:
                 handleCreateRoomEvent((ClientCreateRoomEvent) (msg.getMsgDTO()), from);
@@ -118,7 +121,8 @@ public class MessageHandler {
     }
 
     private void handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.getSuggestion(request.getTopic(), from.getId());
     }
 
     private void handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
