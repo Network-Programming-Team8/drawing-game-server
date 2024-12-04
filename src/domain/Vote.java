@@ -1,7 +1,6 @@
 package domain;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dto.event.Event;
 import dto.event.server.ServerFinishVoteEvent;
@@ -16,17 +15,16 @@ public class Vote {
 
     private final Sender sender;
     private final Room room;
-    private final Map<Integer, Integer> voteCounter;
+    private final ConcurrentHashMap<Integer, Integer> voteCounter;
     private final int voteTimeLimit;
     private boolean isVoteEnd;
 
     public Vote(Room room, Sender sender){
         this.sender = sender;
         this.room = room;
-        this.voteCounter = new HashMap<>();
+        this.voteCounter = new ConcurrentHashMap<>();
         this.voteTimeLimit = 30;
         this.isVoteEnd = false;
-        room.vote = this;
     }
 
     public void startVote() throws GameServerException, InterruptedException {
@@ -65,5 +63,5 @@ public class Vote {
 
     public boolean isVoteEnd() { return isVoteEnd; }
 
-    public Map<Integer, Integer> getVoteState() { return voteCounter; }
+    public ConcurrentHashMap<Integer, Integer> getVoteState() { return voteCounter; }
 }
