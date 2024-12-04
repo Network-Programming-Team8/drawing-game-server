@@ -39,17 +39,15 @@ public class VoteManager implements Runnable {
     @Override
     public void run() {
         try {
-            Room room = roomManager.getRoom(roomID);
-            if (room != null){
-                while(true){
-                    if(room.getIsGameEnd())
-                        break;
-                }
-                requestVote(room);
-                wait(30);
-                finishVote(room);
-            }
-        } catch (GameServerException | InterruptedException e) {
+            Room room;
+            do {
+                room = roomManager.getRoom(roomID);
+            } while (!room.getIsGameEnd());
+
+            requestVote(room);
+            wait(30*1000);
+            finishVote(room);
+        }  catch (GameServerException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
