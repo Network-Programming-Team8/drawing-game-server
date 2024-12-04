@@ -88,8 +88,12 @@ public class Room {
         return readyStatusMap.get(userId);
     }
 
-    public void setReady(int userId, boolean ready) {
+    public void setReady(int userId, boolean ready) throws GameServerException {
         readyStatusMap.put(userId, ready);
+        if(readyStatusMap.size() == participantLimit &&
+                readyStatusMap.values().stream().allMatch(readyStatus -> readyStatus)) {
+            gameSetter.requestTopic();
+        }
     }
 
     public void getSuggestion(String topic, int id) throws GameServerException {
