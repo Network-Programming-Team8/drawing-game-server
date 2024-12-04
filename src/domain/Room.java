@@ -23,6 +23,7 @@ public class Room {
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
     private final Sender sender;
+    private final GameSetter gameSetter = new GameSetter(this);
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner, Sender sender) throws GameServerException {
         this.id = id;
@@ -60,7 +61,7 @@ public class Room {
         user.leaveRoom();
         userMap.remove(userId);
         readyStatusMap.remove(userId);
-        broadCastRoomUpdateEvent(this);
+        broadCastRoomUpdateEvent();
     }
 
     public int getId() {
@@ -91,21 +92,28 @@ public class Room {
         readyStatusMap.put(userId, ready);
     }
 
+    public void getSuggestion(String topic, int id) throws GameServerException {
+        gameSetter.getSuggestion(topic, id);
+    }
+
     public boolean isEmpty() {
         return userMap.isEmpty();
     }
 
+    public int getSize() {
+        return userMap.size();
+    }
 
     //TODO ServerEventListener 만들어서 Sender 대신 주입, 아래 중복 책임 담당하도록 바꾸기
     private void sendTo(Message message, User to) {
         sender.send(message, to.getId());
     }
-    private void broadcastIn(Message message, Room room) throws GameServerException {
-        sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
+    void broadcastIn(Message message) throws GameServerException {
+        sender.sendToAll(message, this.getUserList().stream().map(User::getId).toList());
     }
-    private void broadCastRoomUpdateEvent(Room room) throws GameServerException {
-        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
+    private void broadCastRoomUpdateEvent() throws GameServerException {
+        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(this));
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
-        broadcastIn(message, room);
+        broadcastIn(message);
     }
 }

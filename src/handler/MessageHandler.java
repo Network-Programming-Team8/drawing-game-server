@@ -117,7 +117,8 @@ public class MessageHandler {
     }
 
     private void handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.getSuggestion(request.getTopic(), from.getId());
     }
 
     private void handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
