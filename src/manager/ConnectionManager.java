@@ -15,15 +15,23 @@ public class ConnectionManager {
     private int lastID = 0;
 
     private Connection getConnection (int id) {
-        if(!connectionMap.containsKey(id)) {
+        if(!hasConnection(id)) {
             System.err.println("연결을 찾을 수 없습니다.");
         }
         return connectionMap.get(id);
     }
 
+    public boolean hasConnection(int id) {
+        return connectionMap.containsKey(id);
+    }
+
     public int addConnection (ObjectOutputStream os, ObjectInputStream is) {
         connectionMap.put(++lastID, new Connection(os, is));
         return lastID;
+    }
+
+    public boolean hasUser(int id) {
+        return getConnection(id).hasUser();
     }
 
     public User getUser(int id) throws GameServerException {
@@ -34,11 +42,16 @@ public class ConnectionManager {
         return getConnection(id).getOs();
     }
 
+    public ObjectInputStream getInputStream(int id) {
+        return getConnection(id).getIs();
+    }
+
     public void registerUserTo(User user, int id) {
         getConnection(id).registerUser(user);
     }
 
-    public void deleteConnection (int id) {
+    public void closeConnection (int id) {
+        getConnection(id).close();
         connectionMap.remove(id);
     }
 }

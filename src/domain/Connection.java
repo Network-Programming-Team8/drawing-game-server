@@ -3,6 +3,7 @@ package domain;
 import exception.ErrorType;
 import exception.GameServerException;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -37,5 +38,18 @@ public class Connection {
 
     public ObjectInputStream getIs() {
         return is;
+    }
+
+    public void close() {
+        try {
+            os.close();
+            is.close();
+        } catch (IOException e) {
+            System.err.println("연결 종료 중 오류 발생: " + e.getMessage());
+        }
+        if(hasUser()) {
+            System.out.println(user.getNickname() + " 클라이언트 연결 종료");
+        }
+        System.out.println("익명 클라이언트 연결 종료");
     }
 }

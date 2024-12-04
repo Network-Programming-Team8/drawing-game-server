@@ -19,21 +19,31 @@ public class Sender {
         this.connectionManager = connectionManager;
     }
 
-    public void send(Message message, ObjectOutputStream os) {
-        try {
-            os.writeObject(message);
-        } catch (IOException e) {
-            System.err.println("송신 중 오류 발생"); //아래 send에서도 알아야해서 다른 exception으로 해야 함
+    public void send(Message message, ObjectOutputStream os) throws ConnectionError {
+        synchronized (os) { // ObjectOutputStream에 동기화 적용
+            try {
+                os.writeObject(message);
+            } catch (IOException e) {
+                throw new ConnectionError(ErrorType.MESSAGE_SEND_ERROR);
+            }
         }
     }
 
     public void send(Message message, int id) {
-        send(message, connectionManager.getOutputStream(id));
+        ObjectOutputStream os = connectionManager.getOutputStream(id);
+        try {
+            send(message, os);
+        } catch (ConnectionError e) {
+            System.err.println("메시지 송신 불가: 클라이언트와 연결이 끊어졌습니다.");
+            connectionManager.closeConnection(id);
+        }
     }
 
     public void sendToAll(Message message, int roomId) throws GameServerException {
         roomManager.getRoom(roomId).getUserList().forEach(
-            user -> { send(message, user.getId()); }
+                user -> {
+                    send(message, user.getId());
+                }
         );
     }
 }
