@@ -88,9 +88,7 @@ public class MessageHandler {
     private void handleJoinRoomEvent(ClientJoinRoomEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
-        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
-        broadcastIn(message, room);
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
@@ -126,5 +124,11 @@ public class MessageHandler {
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
 
+    }
+
+    private void broadCastRoomUpdateEvent(Room room) throws GameServerException {
+        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
+        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
+        broadcastIn(message, room);
     }
 }
