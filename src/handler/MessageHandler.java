@@ -92,7 +92,9 @@ public class MessageHandler {
     }
 
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
-
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.changeSettings(request.getDrawTimeLimit(), request.getParticipantLimit());
+        broadCastRoomUpdateEvent(room);
     }
 
     private void handleReadyEvent(ClientReadyEvent request, User from) throws GameServerException {

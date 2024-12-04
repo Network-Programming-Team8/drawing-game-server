@@ -10,19 +10,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Room {
     private final int id;
-    private final int drawTimeLimit;
-    int participantLimit;
+    private int drawTimeLimit;
+    private int participantLimit;
     private User owner;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
 
-    public Room(int id, int drawTimeLimit, int participantLimit, User owner){
+    public Room(int id, int drawTimeLimit, int participantLimit, User owner) throws GameServerException {
         this.id = id;
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
         this.owner = owner;
-        userMap.put(owner.getId(), owner);
-        readyStatusMap.put(owner.getId(), false);
+        addUser(owner);
+    }
+
+    public void changeSettings(int drawTimeLimit, int participantLimit) {
+        this.drawTimeLimit = drawTimeLimit;
+        this.participantLimit = participantLimit;
     }
 
     public void addUser(User user) throws GameServerException {
