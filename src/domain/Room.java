@@ -24,8 +24,8 @@ public class Room {
     private int drawTimeLimit;
     private int participantLimit;
     private User owner;
-    private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private Vote vote;
+    private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
     private final Sender sender;
