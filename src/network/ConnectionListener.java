@@ -3,7 +3,6 @@ package network;
 import exception.ConnectionError;
 import exception.ErrorType;
 import handler.MessageHandler;
-import manager.GameRoomManager;
 import manager.ConnectionManager;
 
 import java.io.IOException;
@@ -31,7 +30,8 @@ public class ConnectionListener {
             while(true){
                 Socket socket = server.accept();
                 int connectionId = connect(socket);
-                Thread connectionThread = new Thread(new ConnectionRunner(connectionId, connectionManager, sender, messageHandler));
+                Thread connectionThread = new Thread(
+                        new ConnectionRunner(connectionId, connectionManager, sender, messageHandler));
                 connectionThread.start();
             }
         } catch (Exception ex){
@@ -40,7 +40,7 @@ public class ConnectionListener {
     }
 
     private int connect(Socket socket) throws ConnectionError {
-        try { //TODO 동시성문제?
+        try {
             ObjectOutputStream toClient = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream fromClient = new ObjectInputStream(socket.getInputStream());
             return connectionManager.addConnection(toClient, fromClient);

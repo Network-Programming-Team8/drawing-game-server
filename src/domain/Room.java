@@ -1,12 +1,19 @@
 package domain;
 
+import dto.event.Event;
+import dto.event.server.ServerRoomUpdateEvent;
 import exception.ErrorType;
 import exception.GameServerException;
+import mapper.RoomMapper;
+import message.Message;
+import network.Sender;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static message.MessageType.SERVER_ROOM_UPDATE_EVENT;
 
 public class Room {
     private final int id;
@@ -15,12 +22,14 @@ public class Room {
     private User owner;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
+    private final Sender sender;
 
-    public Room(int id, int drawTimeLimit, int participantLimit, User owner) throws GameServerException {
+    public Room(int id, int drawTimeLimit, int participantLimit, User owner, Sender sender) throws GameServerException {
         this.id = id;
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
         this.owner = owner;
+        this.sender = sender;
         addUser(owner);
     }
 
@@ -51,6 +60,7 @@ public class Room {
         user.leaveRoom();
         userMap.remove(userId);
         readyStatusMap.remove(userId);
+        broadCastRoomUpdateEvent(this);
     }
 
     public int getId() {
@@ -79,5 +89,23 @@ public class Room {
 
     public void setReady(int userId, boolean ready) {
         readyStatusMap.put(userId, ready);
+    }
+
+    public boolean isEmpty() {
+        return userMap.isEmpty();
+    }
+
+
+    //TODO ServerEventListener 만들어서 Sender 대신 주입, 아래 중복 책임 담당하도록 바꾸기
+    private void sendTo(Message message, User to) {
+        sender.send(message, to.getId());
+    }
+    private void broadcastIn(Message message, Room room) throws GameServerException {
+        sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
+    }
+    private void broadCastRoomUpdateEvent(Room room) throws GameServerException {
+        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
+        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
+        broadcastIn(message, room);
     }
 }

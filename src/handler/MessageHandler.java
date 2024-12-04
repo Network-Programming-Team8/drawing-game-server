@@ -79,7 +79,7 @@ public class MessageHandler {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
             throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "참가자 수와 제한 시간은 양수여야 합니다.");
         }
-        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from);
+        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from, sender);
         Event event = new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
         Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
         sendTo(message, from);
@@ -105,7 +105,7 @@ public class MessageHandler {
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
-        room.deleteUser(from.getId());
+        roomManager.deleteUserFrom(from.getId(), from.getRoomID());
         broadCastRoomUpdateEvent(room);
     }
 

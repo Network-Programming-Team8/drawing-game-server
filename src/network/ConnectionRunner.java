@@ -69,6 +69,7 @@ public class ConnectionRunner implements Runnable{
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();
 
         User user = new User(id, clientLoginEvent.getNickName());
+
         connectionManager.registerUserTo(user, id);
         ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
