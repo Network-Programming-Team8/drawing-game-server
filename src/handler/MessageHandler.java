@@ -25,6 +25,9 @@ public class MessageHandler {
     }
 
     public void handle(Message msg, User from) throws GameServerException {
+        if(msg.getMsgDTO() == null) {
+            throw new GameServerException(ErrorType.EVENT_IS_NULL);
+        }
         switch(msg.getType()){
             case CLIENT_CREATE_ROOM_EVENT:
                 handleCreateRoomEvent((ClientCreateRoomEvent) (msg.getMsgDTO()), from);

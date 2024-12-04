@@ -6,6 +6,7 @@ public enum ErrorType {
     UNKNOWN_ERROR("E000", "알 수 없는 오류가 발생했습니다."),
     INVALID_INPUT("E001", "잘못된 입력입니다."),
     SYSTEM_FAILURE("E002", "시스템 내부 오류가 발생했습니다."),
+    EVENT_IS_NULL("E003", "메세지 내 이벤트 객체가 null입니다."),
 
     // **Connection Errors**
     CLIENT_DISCONNECTED("E100", "클라이언트가 연결을 종료했습니다."),
