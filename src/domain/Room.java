@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import exception.ErrorType;
 import exception.GameServerException;
+import network.Sender;
 
 public class Room {
 
@@ -14,15 +15,16 @@ public class Room {
     private int drawTimeLimit;
     private int participantLimit;
     private User owner;
-    protected Vote vote;
+    private Vote vote;
     private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
 
-    public Room(int id, int drawTimeLimit, int participantLimit, User owner){
+    public Room(int id, int drawTimeLimit, int participantLimit, User owner, Sender sender){
         this.id = id;
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
         this.owner = owner;
+        this.vote = new Vote(this, sender);
         userList.add(owner);
         readyStatusMap.put(owner.getId(), false);
     }
@@ -60,7 +62,7 @@ public class Room {
 
     public void vote(int votedUserID) { vote.vote(votedUserID); }
 
-    public Map<Integer, Integer> getVoteState() { return vote.getVoteState(); }
+    public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
 
     public boolean isVoteEnd() { return vote.isVoteEnd(); }
 }

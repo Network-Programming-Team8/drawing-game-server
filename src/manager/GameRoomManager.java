@@ -15,8 +15,7 @@ public class GameRoomManager {
 
     public Room createRoom(int drawTimeLimit, int participantLimit, User creator, Sender sender) throws GameServerException {
         try {
-            Room newRoom = new Room(++lastID, drawTimeLimit, participantLimit, creator);
-            Vote vote = new Vote(newRoom, sender);
+            Room newRoom = new Room(++lastID, drawTimeLimit, participantLimit, creator, sender);
             gameRoomList.put(lastID, newRoom);
             return newRoom;
         } catch (Exception e) {
