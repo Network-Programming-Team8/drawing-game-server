@@ -9,7 +9,7 @@ import static message.MessageType.*;
 
 import domain.User;
 import exception.ErrorType;
-import manager.UserManager;
+import manager.ConnectionManager;
 import manager.GameRoomManager;
 import handler.MessageHandler;
 import message.Message;
@@ -20,7 +20,7 @@ import exception.GameServerException;
 
 
 public class ClientDispatcher implements Runnable{
-    private final UserManager userManager;
+    private final ConnectionManager connectionManager;
     private final MessageHandler messageHandler;
     private final Sender sender;
 
@@ -29,9 +29,9 @@ public class ClientDispatcher implements Runnable{
 
     private boolean isConnected = false;
 
-    public ClientDispatcher(Socket socket, GameRoomManager roomManager, UserManager userManager){
-        this.userManager = userManager;
-        sender = new Sender(roomManager, userManager);
+    public ClientDispatcher(Socket socket, GameRoomManager roomManager, ConnectionManager connectionManager){
+        this.connectionManager = connectionManager;
+        sender = new Sender(roomManager, connectionManager);
         messageHandler = new MessageHandler(roomManager, sender);
         try{
             toClient = new ObjectOutputStream(socket.getOutputStream());
@@ -97,7 +97,7 @@ public class ClientDispatcher implements Runnable{
         }
 
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();
-        user = userManager.createUser(clientLoginEvent.getNickName(), toClient);
+        user = connectionManager.createUser(clientLoginEvent.getNickName(), toClient);
         ServerLoginEvent serverLoginEvent = new ServerLoginEvent(user.getNickname(), user.getId());
 
         Message msgToClient = new Message(SERVER_LOGIN_EVENT, serverLoginEvent);

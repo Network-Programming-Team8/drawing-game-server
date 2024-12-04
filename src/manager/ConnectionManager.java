@@ -6,7 +6,7 @@ import java.util.Map;
 
 import domain.User;
 
-public class UserManager {
+public class ConnectionManager {
 
     private final Map<Integer, User> userList = new HashMap<>();
     private final Map<Integer, ObjectOutputStream> outputStreamList = new HashMap<>();

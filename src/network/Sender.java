@@ -3,18 +3,18 @@ package network;
 import exception.GameServerException;
 import message.Message;
 import manager.GameRoomManager;
-import manager.UserManager;
+import manager.ConnectionManager;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 public class Sender {
     private final GameRoomManager roomManager;
-    private final UserManager userManager;
+    private final ConnectionManager connectionManager;
 
-    public Sender(GameRoomManager roomManager, UserManager userManager) {
+    public Sender(GameRoomManager roomManager, ConnectionManager connectionManager) {
         this.roomManager = roomManager;
-        this.userManager = userManager;
+        this.connectionManager = connectionManager;
     }
 
     public void send(Message message, ObjectOutputStream os) {
@@ -27,7 +27,7 @@ public class Sender {
     }
 
     public void send(Message message, int userId) {
-        send(message, userManager.getOutputStream(userId));
+        send(message, connectionManager.getOutputStream(userId));
     }
 
     public void sendToAll(Message message, int roomId) throws GameServerException {
