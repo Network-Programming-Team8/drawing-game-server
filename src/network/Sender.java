@@ -18,6 +18,12 @@ public class Sender {
         this.userManager = userManager;
     }
 
+    public Sender(GameRoomManager roomManager){ //For Broadcasting Only
+
+        this.roomManager = roomManager;
+        this.userManager = null;
+    }
+
     public void send(Message message, ObjectOutputStream os) {
         try {
             os.writeObject(message);
