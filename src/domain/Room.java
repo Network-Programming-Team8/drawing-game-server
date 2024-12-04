@@ -17,6 +17,8 @@ public class Room {
     private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new HashMap<>();
     private final Map<Integer, Integer> voteCounter = new HashMap<>();
+    private boolean isGameEnd;
+    private boolean isVoteEnd;
 
     public Room(int id, int drawTimeLimit, int participantLimit, User owner){
         this.id = id;
@@ -25,6 +27,8 @@ public class Room {
         this.owner = owner;
         userList.add(owner);
         readyStatusMap.put(owner.getId(), false);
+        this.isGameEnd = false;
+        this.isVoteEnd = false;
     }
 
     public void addUser(User user) throws GameServerException {
@@ -66,6 +70,12 @@ public class Room {
     public boolean isReady(int userId) {
         return readyStatusMap.get(userId);
     }
+
+    public boolean getIsGameEnd() { return isGameEnd; }
+
+    public void setIsVoteEnd() { isVoteEnd = true; }
+
+    public boolean getIsVoteEnd() { return isVoteEnd; }
 
     public Map<Integer, Integer> getVoteState(){ return voteCounter; }
 }
