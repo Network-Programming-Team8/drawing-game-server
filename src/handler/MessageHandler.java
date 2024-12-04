@@ -72,7 +72,7 @@ public class MessageHandler {
     }
 
     private void broadcastIn(Message message, Room room) throws GameServerException {
-        sender.sendToAll(message, room.getId());
+        sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
     }
 
     private void handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {

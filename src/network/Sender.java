@@ -9,13 +9,12 @@ import manager.ConnectionManager;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 public class Sender {
-    private final GameRoomManager roomManager;
     private final ConnectionManager connectionManager;
 
-    public Sender(GameRoomManager roomManager, ConnectionManager connectionManager) {
-        this.roomManager = roomManager;
+    public Sender(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
 
@@ -39,11 +38,7 @@ public class Sender {
         }
     }
 
-    public void sendToAll(Message message, int roomId) throws GameServerException {
-        roomManager.getRoom(roomId).getUserList().forEach(
-                user -> {
-                    send(message, user.getId());
-                }
-        );
+    public void sendToAll(Message message, List<Integer> idList) throws GameServerException {
+        idList.forEach(id -> {send(message, id);});
     }
 }
