@@ -15,12 +15,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static message.MessageType.SERVER_ROOM_UPDATE_EVENT;
 
+import exception.ErrorType;
+import exception.GameServerException;
+import network.Sender;
+
 public class Room {
     private final int id;
     private int drawTimeLimit;
     private int participantLimit;
     private User owner;
+    private Vote vote;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
+    private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
     private final Sender sender;
 
@@ -36,6 +42,9 @@ public class Room {
     public void changeSettings(int drawTimeLimit, int participantLimit) {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
+        this.vote = new Vote(this, sender);
+        userList.add(owner);
+        readyStatusMap.put(owner.getId(), false);
     }
 
     public void addUser(User user) throws GameServerException {
@@ -108,4 +117,12 @@ public class Room {
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
         broadcastIn(message, room);
     }
+
+    public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
+
+    public void vote(int votedUserID) { vote.vote(votedUserID); }
+
+    public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
+
+    public boolean isVoteEnd() { return vote.isVoteEnd(); }
 }
