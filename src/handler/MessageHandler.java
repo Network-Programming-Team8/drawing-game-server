@@ -6,6 +6,7 @@ import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
 import manager.GameRoomManager;
+import mapper.VoteMapper;
 import network.Sender;
 import message.Message;
 import dto.event.Event;
@@ -79,7 +80,7 @@ public class MessageHandler {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
             throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "참가자 수와 제한 시간은 양수여야 합니다.");
         }
-        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from);
+        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from, sender);
         Event event = new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit());
         Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
         sendTo(message, from);
@@ -125,6 +126,19 @@ public class MessageHandler {
     }
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
+        Room room = roomManager.getRoom(from.getRoomID());
+        Event event;
+        Message message;
 
+        if(room.isVoteEnd()){
+            event = new ServerErrorEvent("투표 불가: 투표가 이미 종료되었습니다.");
+            message = new Message(SERVER_ERROR_EVENT, event);
+            sendTo(message, from);
+        }
+        else{
+            event = new ServerVoteEvent(VoteMapper.toVoteInfo(room));
+            message = new Message(SERVER_VOTE_EVENT, event);
+            broadcastIn(message, room);
+        }
     }
 }

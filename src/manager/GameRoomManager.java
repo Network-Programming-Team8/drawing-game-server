@@ -4,18 +4,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import domain.User;
 import domain.Room;
+import domain.Vote;
 import exception.GameServerException;
 import exception.ErrorType;
+import network.Sender;
 
 public class GameRoomManager {
     private final Map<Integer, Room> gameRoomList = new ConcurrentHashMap<>();
     private int lastID = 0;
 
-    public Room createRoom(int drawTimeLimit, int participantLimit, User creator) throws GameServerException {
+    public Room createRoom(int drawTimeLimit, int participantLimit, User creator, Sender sender) throws GameServerException {
         try {
             Room newRoom = new Room(++lastID, drawTimeLimit, participantLimit, creator);
+            Vote vote = new Vote(newRoom, sender);
             gameRoomList.put(lastID, newRoom);
-            Thread voteManager = new Thread(new VoteManager(this, newRoom.getId()));
             return newRoom;
         } catch (Exception e) {
             throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, e);

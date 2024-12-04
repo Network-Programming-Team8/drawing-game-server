@@ -1,19 +1,20 @@
 package domain;
 
-import exception.ErrorType;
-import exception.GameServerException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import exception.ErrorType;
+import exception.GameServerException;
+
 public class Room {
 
     private final int id;
-    private final int drawTimeLimit;
-    int participantLimit;
+    private int drawTimeLimit;
+    private int participantLimit;
     private User owner;
+    protected Vote vote;
     private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
 
@@ -54,4 +55,10 @@ public class Room {
     public boolean isReady(int userId) {
         return readyStatusMap.get(userId);
     }
+
+    public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
+
+    public Map<Integer, Integer> getVoteState() { return vote.getVoteState(); }
+
+    public boolean isVoteEnd() { return vote.isVoteEnd(); }
 }
