@@ -106,6 +106,7 @@ public class MessageHandler {
         Room room = roomManager.getRoom(from.getRoomID());
         room.setReady(from.getId(), request.getIsReady());
         broadCastRoomUpdateEvent(room);
+        room.tryToStart();
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {

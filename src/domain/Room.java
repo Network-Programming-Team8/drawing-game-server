@@ -95,6 +95,9 @@ public class Room {
 
     public void setReady(int userId, boolean ready) throws GameServerException {
         readyStatusMap.put(userId, ready);
+    }
+
+    public void tryToStart() throws GameServerException {
         if(readyStatusMap.size() == participantLimit &&
                 readyStatusMap.values().stream().allMatch(readyStatus -> readyStatus)) {
             gameSetter.requestTopic();
