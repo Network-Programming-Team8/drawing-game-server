@@ -112,11 +112,11 @@ public class Game {
 
     private void changeTurn() throws GameServerException {
         currentOrder.getAndUpdate(i -> i + 1);
-        currentTurnStartTime.set(LocalDateTime.now());
         broadCastCurrentTurn();
     }
 
     private void broadCastCurrentTurn() throws GameServerException {
+        currentTurnStartTime.set(LocalDateTime.now());
         int currentDrawer = getCurrentDrawer();
         boolean isGuessTurn = (currentDrawer == guesserId);
         Event event = new ServerTurnChangeEvent(currentDrawer, currentTurnStartTime.get(), isGuessTurn);
