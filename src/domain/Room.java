@@ -21,6 +21,7 @@ public class Room {
     private int participantLimit;
     private User owner;
     private Vote vote;
+    private Chat chat;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
@@ -33,13 +34,14 @@ public class Room {
         this.participantLimit = participantLimit;
         this.owner = owner;
         this.sender = sender;
+        this.vote = new Vote(this, sender);
+        this.chat = new Chat(this);
         addUser(owner);
     }
 
     public void changeSettings(int drawTimeLimit, int participantLimit) {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
-        this.vote = new Vote(this, sender);
         userList.add(owner);
         readyStatusMap.put(owner.getId(), false);
     }
@@ -125,6 +127,8 @@ public class Room {
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
         broadcast(message);
     }
+
+    public void chatting(String from, String content) throws GameServerException { chat.chatting(from, content); }
 
     public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
 
