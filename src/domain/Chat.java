@@ -12,23 +12,20 @@ import java.util.List;
 public class Chat {
 
     private final Room room;
-    private final List<Integer> userList;
 
     public Chat(Room room){
         this.room = room;
-        this.userList = room.getUserIdList();
     }
 
     public void chatting(User from, String content) throws GameServerException {
-        Event event = new ServerRoomChatMessage(from.getNickname(), content);
-        Message message = new Message(MessageType.SERVER_ROOM_CHAT_MESSAGE, event);
+        List<Integer> userList = room.getUserIdList();
         List<Integer> sendList = new ArrayList<>();
-
-        for (Integer user : userList) {
+        for (int user : userList)
             if (user != from.getId())
                 sendList.add(user);
-        }
 
+        Event event = new ServerRoomChatMessage(from.getNickname(), content);
+        Message message = new Message(MessageType.SERVER_ROOM_CHAT_MESSAGE, event);
         room.broadcastTo(message, sendList);
     }
 }
