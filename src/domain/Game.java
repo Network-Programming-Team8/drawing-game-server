@@ -11,6 +11,7 @@ import exception.GameServerException;
 import message.Message;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,7 +64,7 @@ public class Game {
         if (getCurrentDrawer() != drawer) {
             throw new GameServerException(ErrorType.DRAWER_OUT_OF_ORDER);
         }
-        List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, List.of());
+        List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, new ArrayList<>());
         drawingList.add(drawing);
         drawingMap.put(drawer, drawingList);
         broadCastDrawingEvent(drawer, drawing);
