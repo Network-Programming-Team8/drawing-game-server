@@ -2,6 +2,7 @@ package handler;
 
 import static message.MessageType.*;
 
+import domain.Game;
 import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
@@ -105,6 +106,7 @@ public class MessageHandler {
         Room room = roomManager.getRoom(from.getRoomID());
         room.setReady(from.getId(), request.getIsReady());
         broadCastRoomUpdateEvent(room);
+        room.tryToStart();
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
@@ -115,9 +117,7 @@ public class MessageHandler {
 
     private void handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
-        Event event = new ServerRoomChatMessage(from.getNickname(), request.getMessage());
-        Message message = new Message(SERVER_ROOM_CHAT_MESSAGE, event);
-        broadcastIn(message, room);
+        room.chatting(from, request.getMessage());
     }
 
     private void handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
@@ -126,11 +126,13 @@ public class MessageHandler {
     }
 
     private void handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
-
+        Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
+        game.drawBy(request.getDrawer(), request.getDrawing(), request.getSubmissionTime());
     }
 
     private void handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {
-
+        Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
+        game.guess(from.getId(), request.getSubmissionAnswer(), request.getSubmissionTime());
     }
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {

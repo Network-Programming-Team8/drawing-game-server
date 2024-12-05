@@ -21,6 +21,7 @@ public class Room {
     private int participantLimit;
     private User owner;
     private Vote vote;
+    private Chat chat;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
@@ -33,13 +34,14 @@ public class Room {
         this.participantLimit = participantLimit;
         this.owner = owner;
         this.sender = sender;
+        this.vote = new Vote(this, sender);
+        this.chat = new Chat(this);
         addUser(owner);
     }
 
     public void changeSettings(int drawTimeLimit, int participantLimit) {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
-        this.vote = new Vote(this, sender);
         userList.add(owner);
         readyStatusMap.put(owner.getId(), false);
     }
@@ -95,6 +97,9 @@ public class Room {
 
     public void setReady(int userId, boolean ready) throws GameServerException {
         readyStatusMap.put(userId, ready);
+    }
+
+    public void tryToStart() throws GameServerException {
         if(readyStatusMap.size() == participantLimit &&
                 readyStatusMap.values().stream().allMatch(readyStatus -> readyStatus)) {
             gameSetter.requestTopic();
@@ -118,13 +123,23 @@ public class Room {
         sender.send(message, to.getId());
     }
     void broadcast(Message message) throws GameServerException {
-        sender.sendToAll(message, this.getUserList().stream().map(User::getId).toList());
+        broadcastTo(message, this.getUserList().stream().map(User::getId).toList());
     }
+    void broadcastTo(Message message, List<Integer> idList) throws GameServerException {
+        if( idList.stream().allMatch(this::isThereUser)) {
+            sender.sendToAll(message, idList);
+            return;
+        }
+        throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+    }
+
     private void broadCastRoomUpdateEvent() throws GameServerException {
         Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(this));
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
         broadcast(message);
     }
+
+    public void chatting(User from, String content) throws GameServerException { chat.chatting(from, content); }
 
     public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
 
@@ -133,4 +148,8 @@ public class Room {
     public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
 
     public boolean isVoteEnd() { return vote.isVoteEnd(); }
+
+    public Game getGameOnPlay() throws GameServerException {
+        return gameSetter.getGame();
+    }
 }
