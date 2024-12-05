@@ -2,6 +2,7 @@ package domain;
 
 import dto.event.Event;
 import dto.event.server.ServerDrawEvent;
+import dto.event.server.ServerFinishGameEvent;
 import dto.event.server.ServerStartGameEvent;
 import dto.event.server.ServerTurnChangeEvent;
 import dto.info.DrawElementInfo;
@@ -43,6 +44,7 @@ public class Game {
     public void startGame() throws GameServerException {
         broadCastGameStartEvent();
         rotateTurns();
+        broadCastFinish();
     }
 
     private void broadCastGameStartEvent() throws GameServerException {
@@ -113,6 +115,12 @@ public class Game {
         boolean isGuessTurn = (currentDrawer == guesserId);
         Event event = new ServerTurnChangeEvent(currentDrawer, currentTurnStartTime.get(), isGuessTurn);
         Message message = new Message(SERVER_TURN_CHANGE_EVENT, event);
+        room.broadcast(message);
+    }
+
+    private void broadCastFinish() throws GameServerException {
+        Event event = new ServerFinishGameEvent(topic, submittedAnswer, drawingMap);
+        Message message = new Message(SERVER_FINISH_GAME_EVENT, event);
         room.broadcast(message);
     }
 }
