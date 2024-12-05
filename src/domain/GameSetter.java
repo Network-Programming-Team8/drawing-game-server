@@ -2,6 +2,7 @@ package domain;
 
 import dto.event.Event;
 import dto.event.server.ServerRequestTopicEvent;
+import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
 
@@ -16,6 +17,7 @@ import static message.MessageType.SERVER_REQUEST_TOPIC_EVENT;
 public class GameSetter {
     private final Map<Integer, String> topicSuggestionMap = new ConcurrentHashMap<>();
     private final Room room;
+    private Game game;
 
     public GameSetter(Room room) {
         this.room = room;
@@ -80,5 +82,12 @@ public class GameSetter {
         // 추측자를 리스트의 마지막에 추가
         userIds.add(guesserId);
         return userIds;
+    }
+
+    public Game getGame() throws GameServerException {
+        if (game == null) {
+            throw new GameServerException(ErrorType.NO_GAME_RUNNING);
+        }
+        return game;
     }
 }

@@ -2,6 +2,7 @@ package handler;
 
 import static message.MessageType.*;
 
+import domain.Game;
 import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
@@ -126,7 +127,8 @@ public class MessageHandler {
     }
 
     private void handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
-
+        Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
+        game.drawBy(request.getDrawer(), request.getDrawing());
     }
 
     private void handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {

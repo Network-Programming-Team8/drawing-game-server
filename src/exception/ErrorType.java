@@ -29,7 +29,9 @@ public enum ErrorType {
     // **Game Errors**
     GAME_START_FAILED("E400", "게임을 시작하는 데 실패했습니다."),
     GAME_ACTION_INVALID("E401", "잘못된 게임 액션입니다."),
-    GAME_ROOM_STATE_INVALID("E402", "게임 방 상태가 유효하지 않습니다."),;
+    GAME_ROOM_STATE_INVALID("E402", "게임 방 상태가 유효하지 않습니다."),
+    NO_GAME_RUNNING("E403", "실행 중인 게임이 없습니다."),
+    DRAWER_OUT_OF_ORDER("E404", "현재 해당 유저의 그리기 순서가 아닙니다.");
 
     private final String errorCode;
     private final String errorMessage;
