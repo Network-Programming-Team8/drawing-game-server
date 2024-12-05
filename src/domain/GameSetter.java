@@ -43,7 +43,7 @@ public class GameSetter {
         String topic = selectTopic();
         int guesserId = selectGuesser();
         List<Integer> order = setOrder();
-        return new Game(room, topic, guesserId, order);
+        return new Game(room, topic, guesserId, order, room.getDrawTimeLimit());
     }
 
     private String selectTopic() {
