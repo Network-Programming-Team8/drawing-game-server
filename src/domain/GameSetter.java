@@ -34,7 +34,7 @@ public class GameSetter {
         if (topicSuggestionMap.size() == room.getSize()) {
             //TODO limit으로할지 실제 현재 명수로 할지? 누가 ready 누르고 나가면?
             //일단은 한 번 시작했으면 진행하기로 했으니까 실제 명수로 합시다
-            Game game = setGame();
+            game = setGame();
             game.startGame();
 
         }
