@@ -97,6 +97,9 @@ public class Room {
 
     public void setReady(int userId, boolean ready) throws GameServerException {
         readyStatusMap.put(userId, ready);
+    }
+
+    public void tryToStart() throws GameServerException {
         if(readyStatusMap.size() == participantLimit &&
                 readyStatusMap.values().stream().allMatch(readyStatus -> readyStatus)) {
             gameSetter.requestTopic();
@@ -120,8 +123,16 @@ public class Room {
         sender.send(message, to.getId());
     }
     void broadcast(Message message) throws GameServerException {
-        sender.sendToAll(message, this.getUserList().stream().map(User::getId).toList());
+        broadcastTo(message, this.getUserList().stream().map(User::getId).toList());
     }
+    void broadcastTo(Message message, List<Integer> idList) throws GameServerException {
+        if( idList.stream().allMatch(this::isThereUser)) {
+            sender.sendToAll(message, idList);
+            return;
+        }
+        throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+    }
+
     private void broadCastRoomUpdateEvent() throws GameServerException {
         Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(this));
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
@@ -137,4 +148,8 @@ public class Room {
     public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
 
     public boolean isVoteEnd() { return vote.isVoteEnd(); }
+
+    public Game getGameOnPlay() throws GameServerException {
+        return gameSetter.getGame();
+    }
 }

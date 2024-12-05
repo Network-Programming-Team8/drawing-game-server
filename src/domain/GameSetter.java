@@ -2,6 +2,7 @@ package domain;
 
 import dto.event.Event;
 import dto.event.server.ServerRequestTopicEvent;
+import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
 
@@ -16,6 +17,7 @@ import static message.MessageType.SERVER_REQUEST_TOPIC_EVENT;
 public class GameSetter {
     private final Map<Integer, String> topicSuggestionMap = new ConcurrentHashMap<>();
     private final Room room;
+    private Game game;
 
     public GameSetter(Room room) {
         this.room = room;
@@ -32,8 +34,9 @@ public class GameSetter {
         if (topicSuggestionMap.size() == room.getSize()) {
             //TODO limit으로할지 실제 현재 명수로 할지? 누가 ready 누르고 나가면?
             //일단은 한 번 시작했으면 진행하기로 했으니까 실제 명수로 합시다
-            Game game = setGame();
+            game = setGame();
             game.startGame();
+
         }
     }
 
@@ -41,7 +44,7 @@ public class GameSetter {
         String topic = selectTopic();
         int guesserId = selectGuesser();
         List<Integer> order = setOrder();
-        return new Game(room, topic, guesserId, order);
+        return new Game(room, topic, guesserId, order, room.getDrawTimeLimit());
     }
 
     private String selectTopic() {
@@ -80,5 +83,12 @@ public class GameSetter {
         // 추측자를 리스트의 마지막에 추가
         userIds.add(guesserId);
         return userIds;
+    }
+
+    public Game getGame() throws GameServerException {
+        if (game == null) {
+            throw new GameServerException(ErrorType.NO_GAME_RUNNING);
+        }
+        return game;
     }
 }
