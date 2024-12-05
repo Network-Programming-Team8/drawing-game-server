@@ -118,9 +118,10 @@ public class Game {
         room.broadcast(message);
     }
 
-    private void broadCastFinish() throws GameServerException {
+    private void broadCastFinish() throws GameServerException, InterruptedException {
         Event event = new ServerFinishGameEvent(topic, submittedAnswer, drawingMap);
         Message message = new Message(SERVER_FINISH_GAME_EVENT, event);
         room.broadcast(message);
+        room.startVote();
     }
 }
