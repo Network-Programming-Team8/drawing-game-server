@@ -96,23 +96,23 @@ public class Game {
         for (int i = 0; i <= order.size(); i++) {
             scheduler.schedule(() -> {
                 try {
-                    if(currentOrder.get() < order.size()) {
-                        changeTurn();
-                    } else {
-                        broadCastFinish();
-                    }
+                    changeTurn();
                 } catch (GameServerException | InterruptedException e) {
-                    //TODO 서버이벤트리스너 추가 후에 처리하기
                     throw new RuntimeException(e);
+                    //TODO 서버이벤트리스너 추가 후에 처리하기
                 }
             }, timeout, TimeUnit.SECONDS);
         }
         scheduler.shutdown(); // 타이머 종료
     }
 
-    private void changeTurn() throws GameServerException {
+    private void changeTurn() throws GameServerException, InterruptedException {
         currentOrder.getAndUpdate(i -> i + 1);
-        broadCastCurrentTurn();
+        if(currentOrder.get() < order.size()) {
+            broadCastCurrentTurn();
+        } else {
+            broadCastFinish();
+        }
     }
 
     private void broadCastCurrentTurn() throws GameServerException {
