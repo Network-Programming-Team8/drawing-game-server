@@ -60,10 +60,10 @@ public class Game {
     }
 
     public void drawBy(int drawer, DrawElementInfo drawing, LocalDateTime submissionTime) throws GameServerException {
-        validateSubmissionTime(submissionTime);
-        if (getCurrentDrawer() != drawer) {
+/*        validateSubmissionTime(submissionTime);
+        if (currentOrder.get()>=order.size() || getCurrentDrawer() != drawer) {
             throw new GameServerException(ErrorType.DRAWER_OUT_OF_ORDER);
-        }
+        }*/ //TODO 과거에서 날라왔을 수 있으므로 submitTime 보고 어떤 유저인지 계산해서 검증하는 식으로 바꾸기
         List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, new ArrayList<>());
         drawingList.add(drawing);
         drawingMap.put(drawer, drawingList);
