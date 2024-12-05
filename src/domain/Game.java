@@ -44,7 +44,7 @@ public class Game {
     public void startGame() throws GameServerException {
         broadCastGameStartEvent();
         rotateTurns();
-        broadCastFinish();
+        //broadCastFinish();
     }
 
     private void broadCastGameStartEvent() throws GameServerException {
