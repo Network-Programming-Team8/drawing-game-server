@@ -43,7 +43,9 @@ public class Game {
 
     public void startGame() throws GameServerException {
         broadCastGameStartEvent();
-        rotateTurns();
+        broadCastCurrentTurn();
+        Thread thread = new Thread(this::rotateTurns);
+        thread.start();
     }
 
     private void broadCastGameStartEvent() throws GameServerException {
@@ -89,8 +91,7 @@ public class Game {
         room.broadcastTo(message, order.subList(0, currentOrder.get()));
     }
 
-    private void rotateTurns() throws GameServerException {
-        broadCastCurrentTurn();
+    private void rotateTurns() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         for (int i = 0; i <= order.size(); i++) {
             scheduler.schedule(() -> {
