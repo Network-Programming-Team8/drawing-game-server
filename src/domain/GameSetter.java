@@ -36,6 +36,7 @@ public class GameSetter {
             //일단은 한 번 시작했으면 진행하기로 했으니까 실제 명수로 합시다
             Game game = setGame();
             game.startGame();
+
         }
     }
 

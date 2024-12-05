@@ -28,8 +28,8 @@ public class Game {
     private final int guesserId;
     private final List<Integer> order;
     private final Map<Integer, List<DrawElementInfo>> drawingMap = new ConcurrentHashMap<>();
-    private int currentOrder = 0;
     private final int timeout;
+    private final AtomicReference<Integer> currentOrder = new AtomicReference<>(0);
     private final AtomicReference<LocalDateTime> currentTurnStartTime = new AtomicReference<>();
     private String submittedAnswer = "";
 
@@ -44,7 +44,6 @@ public class Game {
     public void startGame() throws GameServerException {
         broadCastGameStartEvent();
         rotateTurns();
-        //broadCastFinish();
     }
 
     private void broadCastGameStartEvent() throws GameServerException {
@@ -54,7 +53,7 @@ public class Game {
     }
 
     private int getCurrentDrawer() {
-        return order.get(currentOrder);
+        return order.get(currentOrder.get());
     }
 
     public void drawBy(int drawer, DrawElementInfo drawing, LocalDateTime submissionTime) throws GameServerException {
@@ -87,16 +86,21 @@ public class Game {
     private void broadCastDrawingEvent(int drawer, DrawElementInfo drawing) throws GameServerException {
         Event event = new ServerDrawEvent(drawer, drawing);
         Message message = new Message(SERVER_DRAW_EVENT, event);
-        room.broadcastTo(message, order.subList(0, currentOrder));
+        room.broadcastTo(message, order.subList(0, currentOrder.get()));
     }
 
-    private void rotateTurns() {
+    private void rotateTurns() throws GameServerException {
+        broadCastCurrentTurn();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        for (currentOrder = 0; currentOrder < order.size(); currentOrder++) {
+        for (int i = 0; i <= order.size(); i++) {
             scheduler.schedule(() -> {
                 try {
-                    changeTurn();
-                } catch (GameServerException e) {
+                    if(currentOrder.get() < order.size()) {
+                        changeTurn();
+                    } else {
+                        broadCastFinish();
+                    }
+                } catch (GameServerException | InterruptedException e) {
                     //TODO 서버이벤트리스너 추가 후에 처리하기
                     throw new RuntimeException(e);
                 }
@@ -106,6 +110,7 @@ public class Game {
     }
 
     private void changeTurn() throws GameServerException {
+        currentOrder.getAndUpdate(i -> i + 1);
         currentTurnStartTime.set(LocalDateTime.now());
         broadCastCurrentTurn();
     }
