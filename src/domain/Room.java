@@ -139,7 +139,7 @@ public class Room {
         broadcast(message);
     }
 
-    public void chatting(String from, String content) throws GameServerException { chat.chatting(from, content); }
+    public void chatting(User from, String content) throws GameServerException { chat.chatting(from, content); }
 
     public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
 
