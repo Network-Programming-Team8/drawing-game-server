@@ -132,7 +132,8 @@ public class MessageHandler {
     }
 
     private void handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {
-
+        Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
+        game.guess(from.getId(), request.getSubmissionAnswer(), request.getSubmissionTime());
     }
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {

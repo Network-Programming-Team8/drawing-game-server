@@ -30,6 +30,7 @@ public class Game {
     private int currentOrder = 0;
     private final int timeout;
     private final AtomicReference<LocalDateTime> currentTurnStartTime = new AtomicReference<>();
+    private String submittedAnswer = "";
 
     public Game(Room room, String topic, int guesserId, List<Integer> order, int timeout) {
         this.room = room;
@@ -63,6 +64,14 @@ public class Game {
         drawingList.add(drawing);
         drawingMap.put(drawer, drawingList);
         broadCastDrawingEvent(drawer, drawing);
+    }
+
+    public void guess(int from, String submittedAnswer, LocalDateTime submissionTime) throws GameServerException {
+        validateSubmissionTime(submissionTime);
+        if (from != guesserId) {
+            throw new GameServerException(ErrorType.GUESS_FROM_NONE_GUESSER);
+        }
+        this.submittedAnswer = submittedAnswer;
     }
 
     private void validateSubmissionTime(LocalDateTime submissionTime) throws GameServerException {
