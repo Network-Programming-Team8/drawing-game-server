@@ -128,7 +128,7 @@ public class MessageHandler {
 
     private void handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
         Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
-        game.drawBy(request.getDrawer(), request.getDrawing());
+        game.drawBy(request.getDrawer(), request.getDrawing(), request.getSubmissionTime());
     }
 
     private void handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {
