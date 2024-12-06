@@ -42,8 +42,8 @@ public class GameSetter {
 
     private Game setGame() throws GameServerException {
         String topic = selectTopic();
-        int guesserId = selectGuesser();
         List<Integer> order = setOrder();
+        int guesserId = order.get(order.size() - 1);
         return new Game(room, topic, guesserId, order, room.getDrawTimeLimit());
     }
 
