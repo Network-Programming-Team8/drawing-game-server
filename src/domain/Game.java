@@ -30,7 +30,7 @@ public class Game {
     private final List<Integer> order;
     private final Map<Integer, List<DrawElementInfo>> drawingMap = new ConcurrentHashMap<>();
     private final int timeout;
-    private final AtomicReference<Integer> currentOrder = new AtomicReference<>(0);
+    private final AtomicReference<Integer> currentOrder = new AtomicReference<>(-1);
     private final AtomicReference<LocalDateTime> currentTurnStartTime = new AtomicReference<>();
     private String submittedAnswer = "";
 
@@ -92,15 +92,12 @@ public class Game {
     }
 
     private void rotateTurns() {
-        try {
-            broadCastCurrentTurn();
-        } catch (GameServerException e) {
-            throw new RuntimeException(e);
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        for(int i = 0; i < order.size(); i++) {
+            scheduler.schedule(this::changeTurn, (long) timeout * i, TimeUnit.SECONDS);
         }
-        for(int i = 0; i < order.size() - 1; i++) {
-            schedule(this::changeTurn);
-        }
-        schedule(this::finishGame);
+        scheduler.schedule(this::finishGame, (long) timeout * order.size(), TimeUnit.SECONDS);
+        scheduler.shutdown(); // 타이머 종료
     }
 
     private void finishGame() {
@@ -118,12 +115,6 @@ public class Game {
         } catch (GameServerException | InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    private void schedule(Runnable r) {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.schedule(r, timeout, TimeUnit.SECONDS);
-        scheduler.shutdown(); // 타이머 종료
     }
 
     private void changeTurn() {
