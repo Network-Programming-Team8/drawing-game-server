@@ -88,7 +88,8 @@ public class Game {
     private void broadCastDrawingEvent(int drawer, DrawElementInfo drawing) throws GameServerException {
         Event event = new ServerDrawEvent(drawer, drawing);
         Message message = new Message(SERVER_DRAW_EVENT, event);
-        room.broadcastTo(message, order.subList(0, currentOrder.get()));
+        //room.broadcastTo(message, order.subList(0, currentOrder.get()));
+        room.broadcast(message);
     }
 
     private void rotateTurns() {
