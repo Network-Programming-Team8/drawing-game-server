@@ -11,6 +11,7 @@ import exception.GameServerException;
 import message.Message;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,11 +60,11 @@ public class Game {
     }
 
     public void drawBy(int drawer, DrawElementInfo drawing, LocalDateTime submissionTime) throws GameServerException {
-        validateSubmissionTime(submissionTime);
-        if (getCurrentDrawer() != drawer) {
+/*        validateSubmissionTime(submissionTime);
+        if (currentOrder.get()>=order.size() || getCurrentDrawer() != drawer) {
             throw new GameServerException(ErrorType.DRAWER_OUT_OF_ORDER);
-        }
-        List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, List.of());
+        }*/ //TODO 과거에서 날라왔을 수 있으므로 submitTime 보고 어떤 유저인지 계산해서 검증하는 식으로 바꾸기
+        List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, new ArrayList<>());
         drawingList.add(drawing);
         drawingMap.put(drawer, drawingList);
         broadCastDrawingEvent(drawer, drawing);
@@ -96,23 +97,23 @@ public class Game {
         for (int i = 0; i <= order.size(); i++) {
             scheduler.schedule(() -> {
                 try {
-                    if(currentOrder.get() < order.size()) {
-                        changeTurn();
-                    } else {
-                        broadCastFinish();
-                    }
+                    changeTurn();
                 } catch (GameServerException | InterruptedException e) {
-                    //TODO 서버이벤트리스너 추가 후에 처리하기
                     throw new RuntimeException(e);
+                    //TODO 서버이벤트리스너 추가 후에 처리하기
                 }
             }, timeout, TimeUnit.SECONDS);
         }
         scheduler.shutdown(); // 타이머 종료
     }
 
-    private void changeTurn() throws GameServerException {
+    private void changeTurn() throws GameServerException, InterruptedException {
         currentOrder.getAndUpdate(i -> i + 1);
-        broadCastCurrentTurn();
+        if(currentOrder.get() < order.size()) {
+            broadCastCurrentTurn();
+        } else {
+            broadCastFinish();
+        }
     }
 
     private void broadCastCurrentTurn() throws GameServerException {
