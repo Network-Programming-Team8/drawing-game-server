@@ -70,7 +70,7 @@ public class Game {
     }
 
     public void guess(int from, String submittedAnswer, LocalDateTime submissionTime) throws GameServerException {
-        validateSubmissionTime(submissionTime);
+        //validateSubmissionTime(submissionTime);
         if (from != guesserId) {
             throw new GameServerException(ErrorType.GUESS_FROM_NONE_GUESSER);
         }
