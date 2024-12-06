@@ -44,7 +44,6 @@ public class Game {
 
     public void startGame() throws GameServerException {
         broadCastGameStartEvent();
-        broadCastCurrentTurn();
         Thread thread = new Thread(this::rotateTurns);
         thread.start();
     }
@@ -93,26 +92,46 @@ public class Game {
     }
 
     private void rotateTurns() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        for (int i = 0; i <= order.size(); i++) {
-            scheduler.schedule(() -> {
-                try {
-                    changeTurn();
-                } catch (GameServerException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                    //TODO 서버이벤트리스너 추가 후에 처리하기
-                }
-            }, timeout, TimeUnit.SECONDS);
+        try {
+            broadCastCurrentTurn();
+        } catch (GameServerException e) {
+            throw new RuntimeException(e);
         }
+        for(int i = 0; i < order.size() - 1; i++) {
+            schedule(this::changeTurn);
+        }
+        schedule(this::finishGame);
+    }
+
+    private void finishGame() {
+        try {
+            broadCastFinish();
+        } catch (GameServerException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        startVote();
+    }
+
+    private void startVote() {
+        try {
+            room.startVote();
+        } catch (GameServerException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void schedule(Runnable r) {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(r, timeout, TimeUnit.SECONDS);
         scheduler.shutdown(); // 타이머 종료
     }
 
-    private void changeTurn() throws GameServerException, InterruptedException {
+    private void changeTurn() {
         currentOrder.getAndUpdate(i -> i + 1);
-        if(currentOrder.get() < order.size()) {
+        try {
             broadCastCurrentTurn();
-        } else {
-            broadCastFinish();
+        } catch (GameServerException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -129,6 +148,5 @@ public class Game {
         Event event = new ServerFinishGameEvent(topic, submittedAnswer, drawingMap);
         Message message = new Message(SERVER_FINISH_GAME_EVENT, event);
         room.broadcast(message);
-        room.startVote();
     }
 }
