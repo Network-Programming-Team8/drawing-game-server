@@ -96,11 +96,10 @@ public class Game {
         for(int i = 0; i < order.size(); i++) {
             scheduler.schedule(this::changeTurn, (long) timeout * i, TimeUnit.SECONDS);
         }
-        scheduler.schedule(this::finishGame, (long) timeout * order.size(), TimeUnit.SECONDS);
         scheduler.shutdown(); // 타이머 종료
     }
 
-    private void finishGame() {
+    public void finishGame() {
         try {
             broadCastFinish();
         } catch (GameServerException | InterruptedException e) {
