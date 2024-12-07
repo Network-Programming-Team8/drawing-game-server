@@ -101,6 +101,9 @@ public class MessageHandler {
 
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
+        if(!room.canChangeSettings(from)) {
+            throw new GameServerException(ErrorType.UNAUTHORIZED);
+        }
         room.changeSettings(request.getDrawTimeLimit(), request.getParticipantLimit());
         broadCastRoomUpdateEvent(room);
     }

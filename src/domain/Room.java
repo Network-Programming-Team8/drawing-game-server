@@ -172,4 +172,8 @@ public class Room {
     public Game getGameOnPlay() throws GameServerException {
         return gameSetter.getGame();
     }
+
+    public boolean canChangeSettings(User from) {
+        return owner.equals(from);
+    }
 }
