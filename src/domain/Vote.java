@@ -24,13 +24,11 @@ public class Vote {
 
     private final Room room;
     private final ConcurrentHashMap<Integer, Integer> voteStatus = new ConcurrentHashMap<>();
-    private final int voteTimeLimit;
-    private boolean isVoteEnd;
+    private static final int VOTE_TIME_LIMIT = 30;
+    private AtomicBoolean isVoteEnd = new AtomicBoolean(false);
 
     public Vote(Room room){
         this.room = room;
-        this.voteTimeLimit = 30;
-        this.isVoteEnd = false;
     }
 
     public void startVote() throws GameServerException {
@@ -40,17 +38,18 @@ public class Vote {
     }
 
     private void requestVote() throws GameServerException {
-        Event event = new ServerRequestVoteEvent(voteTimeLimit);
+        Event event = new ServerRequestVoteEvent(VOTE_TIME_LIMIT);
         Message message = new Message(MessageType.SERVER_REQUEST_VOTE_EVENT, event);
         room.broadcast(message);
     }
 
     private void voteTimer() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.schedule(this::finishVote, voteTimeLimit, TimeUnit.SECONDS);
+        scheduler.schedule(this::finishVote, VOTE_TIME_LIMIT, TimeUnit.SECONDS);
     }
 
     private void finishVote() {
+        isVoteEnd.set(true);
         Event event = new ServerFinishVoteEvent(calculateVoteInfo());
         Message message = new Message(MessageType.SERVER_FINISH_VOTE_EVENT, event);
         try{
@@ -58,7 +57,6 @@ public class Vote {
         } catch (GameServerException e){
             throw new RuntimeException(e);
         }
-        isVoteEnd = true;
     }
 
     public synchronized void vote(int to, int from) throws GameServerException {
@@ -77,14 +75,17 @@ public class Vote {
         room.broadcast(message);
     }
 
-    private VoteInfo calculateVoteInfo(){
+    private synchronized VoteInfo calculateVoteInfo() {
         Map<Integer, Integer> voteCount = new HashMap<>();
-        for (Integer voter : voteStatus.keySet()) {
-            Integer votedFor = voteStatus.get(voter);
-            voteCount.put(votedFor, voteCount.getOrDefault(votedFor, 0) + 1);
+        for (Integer userId : room.getUserIdList()) {
+            voteCount.put(userId, 0);
+        }
+        for (Map.Entry<Integer, Integer> entry : voteStatus.entrySet()) {
+            Integer votedFor = entry.getValue();
+            voteCount.put(votedFor, voteCount.get(votedFor) + 1);
         }
         return new VoteInfo(voteCount);
     }
 
-    public boolean isVoteEnd() { return isVoteEnd; }
+    public boolean isVoteEnd() { return isVoteEnd.get(); }
 }
