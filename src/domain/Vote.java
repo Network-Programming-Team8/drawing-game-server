@@ -54,7 +54,9 @@ public class Vote {
 
     public void vote(int id){
         if(voteCounter.containsKey((id))){
-            voteCounter.put(id, voteCounter.get(id)+1);
+            int votedNum = voteCounter.get(id);
+            voteCounter.remove(id);
+            voteCounter.put(id, votedNum+1);
         }
         else{
             voteCounter.put(id, 1);
