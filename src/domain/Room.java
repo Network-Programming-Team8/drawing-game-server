@@ -7,6 +7,7 @@ import exception.GameServerException;
 import mapper.RoomMapper;
 import message.Message;
 import network.Sender;
+import util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,15 +62,24 @@ public class Room {
         return userMap.containsKey(userId);
     }
 
-    public void deleteUser(int userId) throws GameServerException {
+    public synchronized void deleteUser(int userId) throws GameServerException {
         if (!isThereUser(userId)) {
             throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
         }
         User user = userMap.get(userId);
+        if(user.equals(owner)) {
+            setNewRandomOwner();
+        }
         user.leaveRoom();
         userMap.remove(userId);
         readyStatusMap.remove(userId);
         broadCastRoomUpdateEvent();
+    }
+
+    private void setNewRandomOwner() {
+        List<User> candidates = new ArrayList<User>(userList);
+        candidates.remove(owner);
+        owner = Utils.selectRandomlyFrom(candidates);
     }
 
     public int getId() {
@@ -161,5 +171,13 @@ public class Room {
 
     public Game getGameOnPlay() throws GameServerException {
         return gameSetter.getGame();
+    }
+
+    public boolean canChangeSettings(User from) {
+        return owner.equals(from);
+    }
+
+    public int getOwnerId() {
+        return owner.getId();
     }
 }

@@ -36,7 +36,10 @@ public enum ErrorType {
     SUBMISSION_OUT_OF_TIME("E406", "제한 시간이 지났습니다."),
 
     // **Vote Errors**
-    NOT_ACCEPTING_VOTE("E501", "투표 시간이 아닙니다.");
+    NOT_ACCEPTING_VOTE("E501", "투표 시간이 아닙니다."),
+
+    // **Permission Errors**
+    UNAUTHORIZED("E600", "권한이 없는 유저가 설정을 변경하려고 시도했습니다.");
 
     private final String errorCode;
     private final String errorMessage;
