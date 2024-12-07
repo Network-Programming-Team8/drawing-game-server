@@ -54,7 +54,7 @@ public class ConnectionRunner implements Runnable{
         System.err.println("에러 메세지 송신됨: " + errorMessage);
     }
 
-    private void handleMessageWith(User user) throws GameServerException{
+    private void handleMessageWith(User user) throws GameServerException, InterruptedException {
         Message msgFromClient = getMessageFromClient();
         messageHandler.handle(msgFromClient, user);
     }
@@ -89,7 +89,7 @@ public class ConnectionRunner implements Runnable{
         while(connectionManager.hasConnection(id)){
             try {
                 handleMessageWith(connectionManager.getUser(id));
-            } catch (GameServerException e) {
+            } catch (GameServerException | InterruptedException e) {
                 sendAndLogErrorMessage(e);
             }
         }
