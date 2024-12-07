@@ -17,7 +17,7 @@ public class Chat {
         this.room = room;
     }
 
-    public void chatting(User from, String content) throws GameServerException {
+    public void sendChat(User from, String content) throws GameServerException {
         List<Integer> userList = room.getUserIdList();
         List<Integer> sendList = new ArrayList<>();
         for (int user : userList)

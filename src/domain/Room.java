@@ -151,7 +151,7 @@ public class Room {
         broadcast(message);
     }
 
-    public void chatting(User from, String content) throws GameServerException { chat.chatting(from, content); }
+    public void sendChat(User from, String content) throws GameServerException { chat.sendChat(from, content); }
 
     private void startVote() throws GameServerException, InterruptedException { vote.startVote(); }
 
