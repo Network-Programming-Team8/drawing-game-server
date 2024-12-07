@@ -126,7 +126,7 @@ public class MessageHandler {
 
     private void handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
-        room.chatting(from, request.getMessage());
+        room.sendChat(from, request.getMessage());
     }
 
     private void handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
