@@ -33,7 +33,10 @@ public enum ErrorType {
     NO_GAME_RUNNING("E403", "실행 중인 게임이 없습니다."),
     DRAWER_OUT_OF_ORDER("E404", "현재 해당 유저의 그리기 순서가 아닙니다."),
     GUESS_FROM_NONE_GUESSER("E405", "해당 유저는 이번 게임의 맞추는 사람이 아닙니다."),
-    SUBMISSION_OUT_OF_TIME("E406", "제한 시간이 지났습니다.");
+    SUBMISSION_OUT_OF_TIME("E406", "제한 시간이 지났습니다."),
+
+    // **Vote Errors**
+    NOT_ACCEPTING_VOTE("E501", "투표 시간이 아닙니다.");
 
     private final String errorCode;
     private final String errorMessage;

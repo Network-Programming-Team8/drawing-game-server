@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static message.MessageType.SERVER_ROOM_UPDATE_EVENT;
+import static message.MessageType.*;
 
 public class Room {
     private final int id;
@@ -143,11 +143,11 @@ public class Room {
 
     public void startVote() throws GameServerException, InterruptedException { vote.startVote(); }
 
-    public void vote(int votedUserID) { vote.vote(votedUserID); }
+    public void vote(int to, int from) throws GameServerException {
+        vote.vote(to, from);
+    }
 
     public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
-
-    public boolean isVoteEnd() { return vote.isVoteEnd(); }
 
     public Game getGameOnPlay() throws GameServerException {
         return gameSetter.getGame();

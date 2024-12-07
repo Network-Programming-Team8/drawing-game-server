@@ -3,13 +3,19 @@ package domain;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dto.event.Event;
+import dto.event.server.ServerErrorEvent;
 import dto.event.server.ServerFinishVoteEvent;
 import dto.event.server.ServerRequestVoteEvent;
+import dto.event.server.ServerVoteEvent;
+import exception.ErrorType;
 import mapper.VoteMapper;
 import message.Message;
 import message.MessageType;
 import exception.GameServerException;
 import network.Sender;
+
+import static message.MessageType.SERVER_ERROR_EVENT;
+import static message.MessageType.SERVER_VOTE_EVENT;
 
 public class Vote {
 
@@ -52,15 +58,25 @@ public class Vote {
         sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
     }
 
-    public void vote(int id){
-        if(voteCounter.containsKey((id))){
-            int votedNum = voteCounter.get(id);
-            voteCounter.remove(id);
-            voteCounter.put(id, votedNum+1);
+    public void vote(int to, int from) throws GameServerException {
+        if (isVoteEnd()) {
+            throw new GameServerException(ErrorType.NOT_ACCEPTING_VOTE);
+        } else {
+            if (voteCounter.containsKey((to))) {
+                int votedNum = voteCounter.get(to);
+                voteCounter.remove(to);
+                voteCounter.put(to, votedNum + 1);
+            } else {
+                voteCounter.put(to, 1);
+            }
         }
-        else{
-            voteCounter.put(id, 1);
-        }
+        broadCastVoteEvent();
+    }
+
+    private void broadCastVoteEvent() throws GameServerException {
+        Event event = new ServerVoteEvent(VoteMapper.toVoteInfo(room));
+        Message message = new Message(SERVER_VOTE_EVENT, event);
+        room.broadcast(message);
     }
 
     public boolean isVoteEnd() { return isVoteEnd; }
