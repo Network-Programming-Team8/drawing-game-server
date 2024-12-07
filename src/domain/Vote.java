@@ -24,7 +24,7 @@ public class Vote {
 
     private final Room room;
     private final ConcurrentHashMap<Integer, Integer> voteStatus = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, Integer> voteCounter = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, Integer> voteCounter;
     private final int voteTimeLimit;
     private boolean isVoteEnd;
 
