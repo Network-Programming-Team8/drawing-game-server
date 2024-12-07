@@ -25,7 +25,7 @@ public class Vote {
     private final Room room;
     private final ConcurrentHashMap<Integer, Integer> voteStatus = new ConcurrentHashMap<>();
     private static final int VOTE_TIME_LIMIT = 30;
-    private AtomicBoolean isVoteEnd = new AtomicBoolean(false);
+    private final AtomicBoolean isVoteEnd = new AtomicBoolean(false);
 
     public Vote(Room room){
         this.room = room;
