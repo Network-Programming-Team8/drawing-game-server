@@ -42,8 +42,8 @@ public class MessageHandler {
                 handleChangeRoomEvent((ClientChangeRoomSettingEvent) (msg.getMsgDTO()), from);
                 break;
 
-            case CLIENT_READY_EVENT:
-                handleReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from);
+            case CLIENT_GAME_READY_EVENT:
+                handleGameReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_EXIT_ROOM_EVENT:
@@ -64,6 +64,10 @@ public class MessageHandler {
 
             case CLIENT_GUESS_EVENT:
                 handleGuessEvent((ClientGuessEvent) (msg.getMsgDTO()), from);
+                break;
+
+            case CLIENT_VOTE_READY_EVENT:
+                handleVoteReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_VOTE_EVENT:
@@ -102,11 +106,15 @@ public class MessageHandler {
         broadCastRoomUpdateEvent(room);
     }
 
-    private void handleReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
+    private void handleGameReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
         room.setReady(from.getId(), request.getIsReady());
         broadCastRoomUpdateEvent(room);
         room.tryToStart();
+    }
+
+    private void handleVoteReadyEvent(ClientReadyEvent msgDTO, User from) {
+        //TODO trigger vote request
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
