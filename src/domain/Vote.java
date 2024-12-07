@@ -1,36 +1,32 @@
 package domain;
 
-import java.util.Map;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import dto.event.Event;
-import dto.event.server.ServerErrorEvent;
 import dto.event.server.ServerFinishVoteEvent;
 import dto.event.server.ServerRequestVoteEvent;
 import dto.event.server.ServerVoteEvent;
+import dto.info.VoteInfo;
 import exception.ErrorType;
-import mapper.VoteMapper;
 import message.Message;
 import message.MessageType;
 import exception.GameServerException;
 import network.Sender;
 
-import static message.MessageType.SERVER_ERROR_EVENT;
 import static message.MessageType.SERVER_VOTE_EVENT;
 
 public class Vote {
 
-    private final Sender sender;
     private final Room room;
     private final ConcurrentHashMap<Integer, Integer> voteCounter;
     private final int voteTimeLimit;
     private boolean isVoteEnd;
 
     public Vote(Room room, Sender sender){
-        this.sender = sender;
         this.room = room;
         this.voteCounter = new ConcurrentHashMap<>();
         this.voteTimeLimit = 30;
@@ -46,7 +42,7 @@ public class Vote {
     private void requestVote() throws GameServerException {
         Event event = new ServerRequestVoteEvent(voteTimeLimit);
         Message message = new Message(MessageType.SERVER_REQUEST_VOTE_EVENT, event);
-        broadcastIn(message);
+        room.broadcast(message);
     }
 
     public void voteTimer() {
@@ -55,18 +51,15 @@ public class Vote {
     }
 
     public void finishVote() {
-        Event event = new ServerFinishVoteEvent(VoteMapper.toVoteInfo(this));
+        VoteInfo voteInfo = new VoteInfo(new HashMap<>(voteCounter));
+        Event event = new ServerFinishVoteEvent(voteInfo);
         Message message = new Message(MessageType.SERVER_FINISH_VOTE_EVENT, event);
         try{
-            broadcastIn(message);
+            room.broadcast(message);
         } catch (GameServerException e){
             throw new RuntimeException(e);
         }
         isVoteEnd = true;
-    }
-
-    private void broadcastIn(Message message) throws GameServerException {
-        sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
     }
 
     public void vote(int to, int from) throws GameServerException {
@@ -79,13 +72,10 @@ public class Vote {
     }
 
     private void broadCastVoteEvent() throws GameServerException {
-        Event event = new ServerVoteEvent(VoteMapper.toVoteInfo(this));
-        System.out.println();
+        Event event = new ServerVoteEvent(new VoteInfo(new ConcurrentHashMap<>(voteCounter)));
         Message message = new Message(SERVER_VOTE_EVENT, event);
         room.broadcast(message);
     }
 
     public boolean isVoteEnd() { return isVoteEnd; }
-
-    public ConcurrentHashMap<Integer, Integer> getVoteState() { return voteCounter; }
 }

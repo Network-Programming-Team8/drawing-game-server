@@ -16,17 +16,20 @@ public class Sender {
         this.connectionManager = connectionManager;
     }
 
-    public void send(Message message, ObjectOutputStream os) throws ConnectionError {
+    private void send(Message message, ObjectOutputStream os) throws ConnectionError {
         synchronized (os) { // ObjectOutputStream에 동기화 적용
             try {
                 os.writeObject(message);
             } catch (IOException e) {
                 throw new ConnectionError(ErrorType.MESSAGE_SEND_ERROR);
             }
+            System.out.println(message.getType());
+            System.out.println(message.getMsgDTO());
         }
     }
 
     public void send(Message message, int id) {
+        System.out.println("send to " + id);
         ObjectOutputStream os = connectionManager.getOutputStream(id);
         try {
             send(message, os);
@@ -34,7 +37,6 @@ public class Sender {
             System.err.println("메시지 송신 불가: 클라이언트와 연결이 끊어졌습니다.");
             connectionManager.closeConnection(id);
         }
-        System.out.printf("sent to %d: %s%n", id, message.getType());
     }
 
     public void sendToAll(Message message, List<Integer> idList) {
