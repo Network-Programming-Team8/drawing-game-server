@@ -11,10 +11,12 @@ public class ServerCreateRoomEvent extends Event {
     private final int id;
     private final int drawTimeLimit;
     private final int participantLimit;
+    private final int ownerId;
 
-    public ServerCreateRoomEvent(int id, int drawTimeLimit, int participantLimit){
+    public ServerCreateRoomEvent(int id, int drawTimeLimit, int participantLimit, int ownerId){
         this.id = id;
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
+        this.ownerId = ownerId;
     }
 }

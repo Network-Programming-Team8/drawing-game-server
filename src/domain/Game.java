@@ -106,15 +106,6 @@ public class Game {
         } catch (GameServerException | InterruptedException e) {
             e.printStackTrace();
         }
-        startVote();
-    }
-
-    private void startVote() {
-        try {
-            room.startVote();
-        } catch (GameServerException | InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void changeTurn() {
