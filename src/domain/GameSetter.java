@@ -43,7 +43,7 @@ public class GameSetter {
     private Game setGame() throws GameServerException {
         List<Integer> order = setOrder();
         String topic = topicSuggestionMap.get(order.get(0));
-        order.subList(1, order.size());
+        order.remove(0);
         int guesserId = order.get(order.size() - 1);
         return new Game(room, topic, guesserId, order, room.getDrawTimeLimit());
     }
