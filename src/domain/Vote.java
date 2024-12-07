@@ -2,6 +2,9 @@ package domain;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import dto.event.Event;
 import dto.event.server.ServerFinishVoteEvent;
@@ -30,8 +33,8 @@ public class Vote {
 
     public void startVote() throws GameServerException, InterruptedException {
         requestVote();
-        Thread voteTimer = new Thread(new VoteTimer(this));
-        voteTimer.start();
+        Thread thread = new Thread(this::voteTimer);
+        thread.start();
     }
 
     private void requestVote() throws GameServerException {
@@ -40,12 +43,19 @@ public class Vote {
         broadcastIn(message);
     }
 
-    public void finishVote() throws GameServerException, InterruptedException {
-        wait(voteTimeLimit * 1000L);
+    public void voteTimer() {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(this::finishVote, (long)voteTimeLimit, TimeUnit.SECONDS);
+    }
 
+    public void finishVote() {
         Event event = new ServerFinishVoteEvent(VoteMapper.toVoteInfo(room));
         Message message = new Message(MessageType.SERVER_FINISH_VOTE_EVENT, event);
-        broadcastIn(message);
+        try{
+            broadcastIn(message);
+        } catch (GameServerException e){
+            throw new RuntimeException(e);
+        }
         isVoteEnd = true;
     }
 
