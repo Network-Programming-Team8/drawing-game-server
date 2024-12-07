@@ -2,7 +2,6 @@ package network;
 
 import exception.ConnectionError;
 import exception.ErrorType;
-import exception.GameServerException;
 import message.Message;
 import manager.ConnectionManager;
 
