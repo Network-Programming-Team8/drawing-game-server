@@ -62,13 +62,7 @@ public class Vote {
         if (isVoteEnd()) {
             throw new GameServerException(ErrorType.NOT_ACCEPTING_VOTE);
         } else {
-            if (voteCounter.containsKey((to))) {
-                int votedNum = voteCounter.get(to);
-                voteCounter.remove(to);
-                voteCounter.put(to, votedNum + 1);
-            } else {
-                voteCounter.put(to, 1);
-            }
+            voteCounter.compute(to, (k, v) -> v == null ? 1 : v + 1 );
         }
         broadCastVoteEvent();
     }
