@@ -11,11 +11,13 @@ public class RoomInfo implements Info {
     private final int drawTimeLimit;
     private final int participantLimit;
     private final List<UserInfo> userInfoList;
+    private final int ownerId;
 
-    public RoomInfo(int id, int drawTimeLimit, int participantLimit, List<UserInfo> userInfoList) {
+    public RoomInfo(int id, int drawTimeLimit, int participantLimit, List<UserInfo> userInfoList, int ownerId) {
         this.id = id;
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
         this.userInfoList = userInfoList;
+        this.ownerId = ownerId;
     }
 }

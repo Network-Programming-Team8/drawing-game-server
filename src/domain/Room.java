@@ -176,4 +176,8 @@ public class Room {
     public boolean canChangeSettings(User from) {
         return owner.equals(from);
     }
+
+    public int getOwner() {
+        return owner.getId();
+    }
 }
