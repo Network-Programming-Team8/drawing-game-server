@@ -13,7 +13,6 @@ import dto.event.server.ServerVoteEvent;
 import dto.info.VoteInfo;
 import message.Message;
 import message.MessageType;
-import network.Sender;
 import exception.ErrorType;
 import exception.GameServerException;
 
@@ -26,7 +25,7 @@ public class Vote {
     private final int voteTimeLimit;
     private boolean isVoteEnd;
 
-    public Vote(Room room, Sender sender){
+    public Vote(Room room){
         this.room = room;
         this.voteTimeLimit = 30;
         this.isVoteEnd = false;

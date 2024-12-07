@@ -35,7 +35,7 @@ public class Room {
         this.participantLimit = participantLimit;
         this.owner = owner;
         this.sender = sender;
-        this.vote = new Vote(this, sender);
+        this.vote = new Vote(this);
         this.chat = new Chat(this);
         addUser(owner);
     }
