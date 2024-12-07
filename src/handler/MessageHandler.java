@@ -79,7 +79,7 @@ public class MessageHandler {
         sender.send(message, to.getId());
     }
 
-    private void broadcastIn(Message message, Room room) throws GameServerException {
+    private void broadcastIn(Message message, Room room) {
         sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
     }
 
@@ -150,7 +150,7 @@ public class MessageHandler {
         room.vote(request.getVoteUser(), from.getId());
     }
 
-    private void broadCastRoomUpdateEvent(Room room) throws GameServerException {
+    private void broadCastRoomUpdateEvent(Room room) {
         Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
         broadcastIn(message, room);

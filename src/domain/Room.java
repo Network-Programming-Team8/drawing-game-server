@@ -96,11 +96,11 @@ public class Room {
         return readyStatusMap.get(userId);
     }
 
-    public void setReady(int userId, boolean ready) throws GameServerException {
+    public void setReady(int userId, boolean ready) {
         readyStatusMap.put(userId, ready);
     }
 
-    public void setVoteReady(int userId, boolean ready) throws GameServerException{
+    public void setVoteReady(int userId, boolean ready) {
         voteReadyStatusMap.put(userId,ready);
     }
 
@@ -111,7 +111,7 @@ public class Room {
         }
     }
 
-    public void tryToVoteStart() throws GameServerException, InterruptedException {
+    public void tryToVoteStart() throws GameServerException {
         if(voteReadyStatusMap.size() == participantLimit &&
                 voteReadyStatusMap.values().stream().allMatch(readyStatus -> readyStatus)){
             startVote();
@@ -153,7 +153,7 @@ public class Room {
 
     public void chatting(User from, String content) throws GameServerException { chat.chatting(from, content); }
 
-    private void startVote() throws GameServerException, InterruptedException { vote.startVote(); }
+    private void startVote() throws GameServerException { vote.startVote(); }
 
     public void vote(int to, int from) throws GameServerException {
         vote.vote(to, from);
