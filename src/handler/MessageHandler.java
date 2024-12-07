@@ -25,7 +25,7 @@ public class MessageHandler {
         this.sender = sender;
     }
 
-    public void handle(Message msg, User from) throws GameServerException {
+    public void handle(Message msg, User from) throws GameServerException, InterruptedException {
         if(msg.getMsgDTO() == null) {
             throw new GameServerException(ErrorType.EVENT_IS_NULL);
         }
@@ -113,8 +113,10 @@ public class MessageHandler {
         room.tryToStart();
     }
 
-    private void handleVoteReadyEvent(ClientReadyEvent msgDTO, User from) {
-        //TODO trigger vote request
+    private void handleVoteReadyEvent(ClientReadyEvent request, User from) throws GameServerException, InterruptedException {
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.setVoteReady(from.getId(), request.getIsReady());
+        room.tryToVoteStart();
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
