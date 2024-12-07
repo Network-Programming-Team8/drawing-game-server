@@ -40,19 +40,12 @@ public class GameSetter {
         }
     }
 
-    private Game setGame() throws GameServerException {
-        List<Integer> order = setOrder();
-        String topic = topicSuggestionMap.get(order.get(0));
-        //order.remove(0);
-        order.subList(1, order.size());
-        int guesserId = order.get(order.size() - 1);
-        return new Game(room, topic, guesserId, order, room.getDrawTimeLimit());
-    }
-
-    private List<Integer> setOrder() {
+    private Game setGame() {
         List<Integer> userIds = new ArrayList<>(room.getUserIdList());
         Collections.shuffle(userIds);
-        return userIds;
+        String topic = topicSuggestionMap.get(userIds.get(0));
+        int guesserId = userIds.get(userIds.size() - 1);
+        return new Game(room, topic, guesserId, userIds, room.getDrawTimeLimit());
     }
 
     public Game getGame() throws GameServerException {
