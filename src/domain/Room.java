@@ -159,8 +159,6 @@ public class Room {
         vote.vote(to, from);
     }
 
-    public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
-
     public Game getGameOnPlay() throws GameServerException {
         return gameSetter.getGame();
     }

@@ -55,7 +55,7 @@ public class Vote {
     }
 
     public void finishVote() {
-        Event event = new ServerFinishVoteEvent(VoteMapper.toVoteInfo(room));
+        Event event = new ServerFinishVoteEvent(VoteMapper.toVoteInfo(this));
         Message message = new Message(MessageType.SERVER_FINISH_VOTE_EVENT, event);
         try{
             broadcastIn(message);
@@ -79,7 +79,8 @@ public class Vote {
     }
 
     private void broadCastVoteEvent() throws GameServerException {
-        Event event = new ServerVoteEvent(VoteMapper.toVoteInfo(room));
+        Event event = new ServerVoteEvent(VoteMapper.toVoteInfo(this));
+        System.out.println();
         Message message = new Message(SERVER_VOTE_EVENT, event);
         room.broadcast(message);
     }
