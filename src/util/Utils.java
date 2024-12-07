@@ -1,13 +1,14 @@
 package util;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
-    static public <T> T selectRandomlyFrom(List<T> list) {
-        if (list == null || list.isEmpty()) {
-            throw new IllegalArgumentException("List cannot be null or empty");
+    static public <T> T selectRandomlyFrom(Collection<T> collection) {
+        if (collection == null || collection.isEmpty()) {
+            throw new IllegalArgumentException("Collection cannot be null or empty");
         }
+        List<T> list = new ArrayList<>(collection);
         return list.get(ThreadLocalRandom.current().nextInt(list.size()));
     }
 }

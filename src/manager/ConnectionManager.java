@@ -60,7 +60,7 @@ public class ConnectionManager {
             if(hasConnection(id) && hasUser(id)) {
                 User user = getUser(id);
                 if(user.isInRoom()) {
-                    gameRoomManager.deleteUserFrom(id, user.getRoomID());
+                    gameRoomManager.deleteUserFrom(id, user.getRoomId());
                 }
             }
             getConnection(id).close();

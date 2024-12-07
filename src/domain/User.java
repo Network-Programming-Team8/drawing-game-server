@@ -46,5 +46,4 @@ public class User {
     public String getNickname() {
         return nickname;
     }
-    public int getRoomID() { return roomID; }
 }

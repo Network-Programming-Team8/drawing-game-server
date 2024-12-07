@@ -9,9 +9,7 @@ import message.Message;
 import network.Sender;
 import util.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static message.MessageType.*;
@@ -24,7 +22,6 @@ public class Room {
     private Vote vote;
     private Chat chat;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
-    private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
     private final Map<Integer, Boolean> voteReadyStatusMap = new ConcurrentHashMap<>();
     private final Sender sender;
@@ -44,8 +41,6 @@ public class Room {
     public void changeSettings(int drawTimeLimit, int participantLimit) {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
-        userList.add(owner);
-        readyStatusMap.put(owner.getId(), false);
     }
 
     public void addUser(User user) throws GameServerException {
@@ -76,10 +71,11 @@ public class Room {
         broadCastRoomUpdateEvent();
     }
 
-    private void setNewRandomOwner() {
-        List<User> candidates = new ArrayList<User>(userList);
-        candidates.remove(owner);
-        owner = Utils.selectRandomlyFrom(candidates);
+    private synchronized void setNewRandomOwner() {
+        owner = Utils.selectRandomlyFrom(
+                userMap.values().stream()
+                        .filter(u -> !u.equals(owner)
+                        ).toList());
     }
 
     public int getId() {

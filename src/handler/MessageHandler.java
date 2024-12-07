@@ -100,7 +100,7 @@ public class MessageHandler {
     }
 
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
-        Room room = roomManager.getRoom(from.getRoomID());
+        Room room = roomManager.getRoom(from.getRoomId());
         if(!room.canChangeSettings(from)) {
             throw new GameServerException(ErrorType.UNAUTHORIZED);
         }
@@ -109,47 +109,45 @@ public class MessageHandler {
     }
 
     private void handleGameReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
-        Room room = roomManager.getRoom(from.getRoomID());
+        Room room = roomManager.getRoom(from.getRoomId());
         room.setReady(from.getId(), request.getIsReady());
         broadCastRoomUpdateEvent(room);
         room.tryToStart();
     }
 
     private void handleVoteReadyEvent(ClientReadyEvent request, User from) throws GameServerException, InterruptedException {
-        Room room = roomManager.getRoom(from.getRoomID());
+        Room room = roomManager.getRoom(from.getRoomId());
         room.setVoteReady(from.getId(), request.getIsReady());
         room.tryToVoteStart();
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
-        Room room = roomManager.getRoom(from.getRoomID());
-        roomManager.deleteUserFrom(from.getId(), from.getRoomID());
-        broadCastRoomUpdateEvent(room);
+        roomManager.deleteUserFrom(from.getId(), from.getRoomId());
     }
 
     private void handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
-        Room room = roomManager.getRoom(from.getRoomID());
+        Room room = roomManager.getRoom(from.getRoomId());
         room.sendChat(from, request.getMessage());
     }
 
     private void handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
-        Room room = roomManager.getRoom(from.getRoomID());
+        Room room = roomManager.getRoom(from.getRoomId());
         room.getSuggestion(request.getTopic(), from.getId());
     }
 
     private void handleDrawEvent(ClientDrawEvent request, User from) throws GameServerException {
-        Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
+        Game game = roomManager.getRoom(from.getRoomId()).getGameOnPlay();
         game.drawBy(request.getDrawer(), request.getDrawing(), request.getSubmissionTime());
     }
 
     private void handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {
-        Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
+        Game game = roomManager.getRoom(from.getRoomId()).getGameOnPlay();
         game.guess(from.getId(), request.getSubmissionAnswer(), request.getSubmissionTime());
         game.finishGame();
     }
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
-        Room room = roomManager.getRoom(from.getRoomID());
+        Room room = roomManager.getRoom(from.getRoomId());
         room.vote(request.getVoteUser(), from.getId());
     }
 
