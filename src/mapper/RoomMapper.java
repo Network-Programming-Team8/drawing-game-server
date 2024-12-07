@@ -9,6 +9,6 @@ public class RoomMapper {
                 room.getDrawTimeLimit(),
                 room.getParticipantLimit(),
                 room.getUserList().stream().map(user -> UserMapper.toUserInfo(user, room.isReady(user.getId()))).toList(),
-                room.getOwner());
+                room.getOwnerId());
     }
 }

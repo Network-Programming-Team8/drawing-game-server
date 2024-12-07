@@ -177,7 +177,7 @@ public class Room {
         return owner.equals(from);
     }
 
-    public int getOwner() {
+    public int getOwnerId() {
         return owner.getId();
     }
 }
