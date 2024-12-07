@@ -11,6 +11,7 @@ import exception.GameServerException;
 import message.Message;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,8 +29,8 @@ public class Game {
     private final int guesserId;
     private final List<Integer> order;
     private final Map<Integer, List<DrawElementInfo>> drawingMap = new ConcurrentHashMap<>();
-    private int currentOrder = 0;
     private final int timeout;
+    private final AtomicReference<Integer> currentOrder = new AtomicReference<>(-1);
     private final AtomicReference<LocalDateTime> currentTurnStartTime = new AtomicReference<>();
     private String submittedAnswer = "";
 
@@ -43,8 +44,8 @@ public class Game {
 
     public void startGame() throws GameServerException {
         broadCastGameStartEvent();
-        rotateTurns();
-        broadCastFinish();
+        Thread thread = new Thread(this::rotateTurns);
+        thread.start();
     }
 
     private void broadCastGameStartEvent() throws GameServerException {
@@ -54,22 +55,22 @@ public class Game {
     }
 
     private int getCurrentDrawer() {
-        return order.get(currentOrder);
+        return order.get(currentOrder.get());
     }
 
     public void drawBy(int drawer, DrawElementInfo drawing, LocalDateTime submissionTime) throws GameServerException {
-        validateSubmissionTime(submissionTime);
-        if (getCurrentDrawer() != drawer) {
+/*        validateSubmissionTime(submissionTime);
+        if (currentOrder.get()>=order.size() || getCurrentDrawer() != drawer) {
             throw new GameServerException(ErrorType.DRAWER_OUT_OF_ORDER);
-        }
-        List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, List.of());
+        }*/ //TODO 과거에서 날라왔을 수 있으므로 submitTime 보고 어떤 유저인지 계산해서 검증하는 식으로 바꾸기
+        List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, new ArrayList<>());
         drawingList.add(drawing);
         drawingMap.put(drawer, drawingList);
         broadCastDrawingEvent(drawer, drawing);
     }
 
     public void guess(int from, String submittedAnswer, LocalDateTime submissionTime) throws GameServerException {
-        validateSubmissionTime(submissionTime);
+        //validateSubmissionTime(submissionTime);
         if (from != guesserId) {
             throw new GameServerException(ErrorType.GUESS_FROM_NONE_GUESSER);
         }
@@ -87,30 +88,37 @@ public class Game {
     private void broadCastDrawingEvent(int drawer, DrawElementInfo drawing) throws GameServerException {
         Event event = new ServerDrawEvent(drawer, drawing);
         Message message = new Message(SERVER_DRAW_EVENT, event);
-        room.broadcastTo(message, order.subList(0, currentOrder));
+        //room.broadcastTo(message, order.subList(0, currentOrder.get()));
+        room.broadcast(message);
     }
 
     private void rotateTurns() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        for (currentOrder = 0; currentOrder < order.size(); currentOrder++) {
-            scheduler.schedule(() -> {
-                try {
-                    changeTurn();
-                } catch (GameServerException e) {
-                    //TODO 서버이벤트리스너 추가 후에 처리하기
-                    throw new RuntimeException(e);
-                }
-            }, timeout, TimeUnit.SECONDS);
+        for(int i = 0; i < order.size(); i++) {
+            scheduler.schedule(this::changeTurn, (long) timeout * i, TimeUnit.SECONDS);
         }
         scheduler.shutdown(); // 타이머 종료
     }
 
-    private void changeTurn() throws GameServerException {
-        currentTurnStartTime.set(LocalDateTime.now());
-        broadCastCurrentTurn();
+    public void finishGame() {
+        try {
+            broadCastFinish();
+        } catch (GameServerException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void changeTurn() {
+        currentOrder.getAndUpdate(i -> i + 1);
+        try {
+            broadCastCurrentTurn();
+        } catch (GameServerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void broadCastCurrentTurn() throws GameServerException {
+        currentTurnStartTime.set(LocalDateTime.now());
         int currentDrawer = getCurrentDrawer();
         boolean isGuessTurn = (currentDrawer == guesserId);
         Event event = new ServerTurnChangeEvent(currentDrawer, currentTurnStartTime.get(), isGuessTurn);
@@ -118,7 +126,7 @@ public class Game {
         room.broadcast(message);
     }
 
-    private void broadCastFinish() throws GameServerException {
+    private void broadCastFinish() throws GameServerException, InterruptedException {
         Event event = new ServerFinishGameEvent(topic, submittedAnswer, drawingMap);
         Message message = new Message(SERVER_FINISH_GAME_EVENT, event);
         room.broadcast(message);

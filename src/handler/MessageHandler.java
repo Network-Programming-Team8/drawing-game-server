@@ -7,7 +7,6 @@ import domain.User;
 import domain.Room;
 import mapper.RoomMapper;
 import manager.GameRoomManager;
-import mapper.VoteMapper;
 import network.Sender;
 import message.Message;
 import dto.event.Event;
@@ -25,7 +24,7 @@ public class MessageHandler {
         this.sender = sender;
     }
 
-    public void handle(Message msg, User from) throws GameServerException {
+    public void handle(Message msg, User from) throws GameServerException, InterruptedException {
         if(msg.getMsgDTO() == null) {
             throw new GameServerException(ErrorType.EVENT_IS_NULL);
         }
@@ -42,8 +41,8 @@ public class MessageHandler {
                 handleChangeRoomEvent((ClientChangeRoomSettingEvent) (msg.getMsgDTO()), from);
                 break;
 
-            case CLIENT_READY_EVENT:
-                handleReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from);
+            case CLIENT_GAME_READY_EVENT:
+                handleGameReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from);
                 break;
 
             case CLIENT_EXIT_ROOM_EVENT:
@@ -66,6 +65,10 @@ public class MessageHandler {
                 handleGuessEvent((ClientGuessEvent) (msg.getMsgDTO()), from);
                 break;
 
+            case CLIENT_VOTE_READY_EVENT:
+                handleVoteReadyEvent((ClientReadyEvent) (msg.getMsgDTO()), from);
+                break;
+
             case CLIENT_VOTE_EVENT:
                 handleVoteEvent((ClientVoteEvent) (msg.getMsgDTO()), from);
                 break;
@@ -76,7 +79,7 @@ public class MessageHandler {
         sender.send(message, to.getId());
     }
 
-    private void broadcastIn(Message message, Room room) throws GameServerException {
+    private void broadcastIn(Message message, Room room) {
         sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
     }
 
@@ -102,10 +105,17 @@ public class MessageHandler {
         broadCastRoomUpdateEvent(room);
     }
 
-    private void handleReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
+    private void handleGameReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
         room.setReady(from.getId(), request.getIsReady());
         broadCastRoomUpdateEvent(room);
+        room.tryToStart();
+    }
+
+    private void handleVoteReadyEvent(ClientReadyEvent request, User from) throws GameServerException, InterruptedException {
+        Room room = roomManager.getRoom(from.getRoomID());
+        room.setVoteReady(from.getId(), request.getIsReady());
+        room.tryToVoteStart();
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
@@ -116,9 +126,7 @@ public class MessageHandler {
 
     private void handleRoomChatMessage(ClientRoomChatMessage request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
-        Event event = new ServerRoomChatMessage(from.getNickname(), request.getMessage());
-        Message message = new Message(SERVER_ROOM_CHAT_MESSAGE, event);
-        broadcastIn(message, room);
+        room.sendChat(from, request.getMessage());
     }
 
     private void handleSuggestTopicEvent(ClientSuggestTopicEvent request, User from) throws GameServerException {
@@ -134,28 +142,15 @@ public class MessageHandler {
     private void handleGuessEvent(ClientGuessEvent request, User from) throws GameServerException {
         Game game = roomManager.getRoom(from.getRoomID()).getGameOnPlay();
         game.guess(from.getId(), request.getSubmissionAnswer(), request.getSubmissionTime());
+        game.finishGame();
     }
 
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomID());
-        Event event;
-        Message message;
-
-        if(room.isVoteEnd()){
-            event = new ServerErrorEvent("투표 불가: 투표가 이미 종료되었습니다.");
-            message = new Message(SERVER_ERROR_EVENT, event);
-            sendTo(message, from);
-        }
-        else{
-            int votedUser = request.getVoteUser();
-            room.vote(votedUser);
-            event = new ServerVoteEvent(VoteMapper.toVoteInfo(room));
-            message = new Message(SERVER_VOTE_EVENT, event);
-            broadcastIn(message, room);
-        }
+        room.vote(request.getVoteUser(), from.getId());
     }
 
-    private void broadCastRoomUpdateEvent(Room room) throws GameServerException {
+    private void broadCastRoomUpdateEvent(Room room) {
         Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
         broadcastIn(message, room);

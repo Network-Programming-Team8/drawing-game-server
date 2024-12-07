@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static message.MessageType.SERVER_ROOM_UPDATE_EVENT;
+import static message.MessageType.*;
 
 public class Room {
     private final int id;
@@ -21,9 +21,11 @@ public class Room {
     private int participantLimit;
     private User owner;
     private Vote vote;
+    private Chat chat;
     private final Map<Integer, User> userMap = new ConcurrentHashMap<>();
     private final List<User> userList = new ArrayList<>();
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
+    private final Map<Integer, Boolean> voteReadyStatusMap = new ConcurrentHashMap<>();
     private final Sender sender;
     private final GameSetter gameSetter = new GameSetter(this);
 
@@ -33,13 +35,14 @@ public class Room {
         this.participantLimit = participantLimit;
         this.owner = owner;
         this.sender = sender;
+        this.vote = new Vote(this);
+        this.chat = new Chat(this);
         addUser(owner);
     }
 
     public void changeSettings(int drawTimeLimit, int participantLimit) {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
-        this.vote = new Vote(this, sender);
         userList.add(owner);
         readyStatusMap.put(owner.getId(), false);
     }
@@ -93,11 +96,25 @@ public class Room {
         return readyStatusMap.get(userId);
     }
 
-    public void setReady(int userId, boolean ready) throws GameServerException {
+    public void setReady(int userId, boolean ready) {
         readyStatusMap.put(userId, ready);
+    }
+
+    public void setVoteReady(int userId, boolean ready) {
+        voteReadyStatusMap.put(userId,ready);
+    }
+
+    public void tryToStart() throws GameServerException {
         if(readyStatusMap.size() == participantLimit &&
                 readyStatusMap.values().stream().allMatch(readyStatus -> readyStatus)) {
             gameSetter.requestTopic();
+        }
+    }
+
+    public void tryToVoteStart() throws GameServerException {
+        if(voteReadyStatusMap.size() == participantLimit &&
+                voteReadyStatusMap.values().stream().allMatch(readyStatus -> readyStatus)){
+            startVote();
         }
     }
 
@@ -134,13 +151,13 @@ public class Room {
         broadcast(message);
     }
 
-    public void startVote() throws InterruptedException, GameServerException { vote.startVote(); }
+    public void sendChat(User from, String content) throws GameServerException { chat.sendChat(from, content); }
 
-    public void vote(int votedUserID) { vote.vote(votedUserID); }
+    private void startVote() throws GameServerException { vote.startVote(); }
 
-    public ConcurrentHashMap<Integer, Integer> getVoteState() { return vote.getVoteState(); }
-
-    public boolean isVoteEnd() { return vote.isVoteEnd(); }
+    public void vote(int to, int from) throws GameServerException {
+        vote.vote(to, from);
+    }
 
     public Game getGameOnPlay() throws GameServerException {
         return gameSetter.getGame();
