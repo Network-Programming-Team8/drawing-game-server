@@ -1,10 +1,12 @@
 package domain;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import dto.event.Event;
 import dto.event.server.ServerFinishVoteEvent;
@@ -49,8 +51,7 @@ public class Vote {
     }
 
     private void finishVote() {
-        ConcurrentHashMap<Integer, Integer> voteCounter = getVoteCounter();
-        Event event = new ServerFinishVoteEvent(new VoteInfo(voteCounter));
+        Event event = new ServerFinishVoteEvent(calculateVoteInfo());
         Message message = new Message(MessageType.SERVER_FINISH_VOTE_EVENT, event);
         try{
             room.broadcast(message);
@@ -60,7 +61,7 @@ public class Vote {
         isVoteEnd = true;
     }
 
-    public void vote(int to, int from) throws GameServerException {
+    public synchronized void vote(int to, int from) throws GameServerException {
         if (isVoteEnd()){
             throw new GameServerException(ErrorType.NOT_ACCEPTING_VOTE);
         }
@@ -71,18 +72,18 @@ public class Vote {
     }
 
     private void broadCastVoteEvents() throws GameServerException {
-        ConcurrentHashMap<Integer, Integer> voteCounter = getVoteCounter();
-        Event event = new ServerVoteEvent(new VoteInfo(voteCounter));
+        Event event = new ServerVoteEvent(calculateVoteInfo());
         Message message = new Message(SERVER_VOTE_EVENT, event);
         room.broadcast(message);
     }
 
-    private ConcurrentHashMap<Integer, Integer> getVoteCounter(){
-        ConcurrentHashMap<Integer, Integer> voteCounter = new ConcurrentHashMap<>();
-        for(Map.Entry<Integer, Integer> entry: voteStatus.entrySet()){
-            voteCounter.compute(entry.getValue(), (k, v) -> v == null ? 1 : v + 1 );
+    private VoteInfo calculateVoteInfo(){
+        Map<Integer, Integer> voteCount = new HashMap<>();
+        for (Integer voter : voteStatus.keySet()) {
+            Integer votedFor = voteStatus.get(voter);
+            voteCount.put(votedFor, voteCount.getOrDefault(votedFor, 0) + 1);
         }
-        return voteCounter;
+        return new VoteInfo(voteCount);
     }
 
     public boolean isVoteEnd() { return isVoteEnd; }
