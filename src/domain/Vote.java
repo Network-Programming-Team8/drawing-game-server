@@ -17,6 +17,7 @@ import message.Message;
 import message.MessageType;
 import exception.ErrorType;
 import exception.GameServerException;
+import util.UnixSeconds;
 
 import static message.MessageType.SERVER_VOTE_EVENT;
 
@@ -38,7 +39,7 @@ public class Vote {
     }
 
     private void requestVote() throws GameServerException {
-        Event event = new ServerRequestVoteEvent(VOTE_TIME_LIMIT);
+        Event event = new ServerRequestVoteEvent(UnixSeconds.now().plusSeconds(VOTE_TIME_LIMIT).toLong());
         Message message = new Message(MessageType.SERVER_REQUEST_VOTE_EVENT, event);
         room.broadcast(message);
     }

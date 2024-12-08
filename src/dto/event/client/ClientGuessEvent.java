@@ -10,17 +10,17 @@ public class ClientGuessEvent extends Event {
     @Serial
     private static final long serialVersionUID = -8020794494854676020L;
     private final String submissionAnswer;
-    private final LocalDateTime submissionTime;
+    private final long submissionTime;
 
-    public ClientGuessEvent(String submissionAnswer) {
+    public ClientGuessEvent(String submissionAnswer, long submissionTime) {
         this.submissionAnswer = submissionAnswer;
-        this.submissionTime = LocalDateTime.now();
+        this.submissionTime = submissionTime;
     }
 
     public String getSubmissionAnswer(){
         return submissionAnswer;
     }
-    public LocalDateTime getSubmissionTime(){
+    public long getSubmissionTime(){
         return submissionTime;
     }
 }

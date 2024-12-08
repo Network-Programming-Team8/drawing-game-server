@@ -9,9 +9,9 @@ public class ServerRequestVoteEvent extends Event {
 
     @Serial
     private static final long serialVersionUID = -9092300978127437216L;
-    private final LocalDateTime endTime;
+    private final long endTime;
 
-    public ServerRequestVoteEvent(int voteTimeLimit) {
-        this.endTime = LocalDateTime.now().plusSeconds(voteTimeLimit);
+    public ServerRequestVoteEvent(long endTime) {
+        this.endTime = endTime;
     }
 }

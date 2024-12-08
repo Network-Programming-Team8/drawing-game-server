@@ -9,6 +9,7 @@ import dto.info.DrawElementInfo;
 import exception.ErrorType;
 import exception.GameServerException;
 import message.Message;
+import util.UnixSeconds;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class Game {
     private final Map<Integer, List<DrawElementInfo>> drawingMap = new ConcurrentHashMap<>();
     private final int timeout;
     private final AtomicReference<Integer> currentOrder = new AtomicReference<>(-1);
-    private final AtomicReference<LocalDateTime> currentTurnStartTime = new AtomicReference<>();
+    private final AtomicReference<UnixSeconds> currentTurnStartTime = new AtomicReference<>();
     private String submittedAnswer = "";
 
     public Game(Room room, String topic, int guesserId, List<Integer> order, int timeout) {
@@ -58,8 +59,8 @@ public class Game {
         return order.get(currentOrder.get());
     }
 
-    public void drawBy(int drawer, DrawElementInfo drawing, LocalDateTime submissionTime) throws GameServerException {
-/*        validateSubmissionTime(submissionTime);
+    public void drawBy(int drawer, DrawElementInfo drawing, long submissionTime) throws GameServerException {
+/*        validateSubmissionTime(UnixSeconds.from(submissionTime));
         if (currentOrder.get()>=order.size() || getCurrentDrawer() != drawer) {
             throw new GameServerException(ErrorType.DRAWER_OUT_OF_ORDER);
         }*/ //TODO 과거에서 날라왔을 수 있으므로 submitTime 보고 어떤 유저인지 계산해서 검증하는 식으로 바꾸기
@@ -69,7 +70,7 @@ public class Game {
         broadCastDrawingEvent(drawer, drawing);
     }
 
-    public void guess(int from, String submittedAnswer, LocalDateTime submissionTime) throws GameServerException {
+    public void guess(int from, String submittedAnswer, long submissionTime) throws GameServerException {
         //validateSubmissionTime(submissionTime);
         if (from != guesserId) {
             throw new GameServerException(ErrorType.GUESS_FROM_NONE_GUESSER);
@@ -77,8 +78,8 @@ public class Game {
         this.submittedAnswer = submittedAnswer;
     }
 
-    private void validateSubmissionTime(LocalDateTime submissionTime) throws GameServerException {
-        LocalDateTime turnStart = currentTurnStartTime.get();
+    private synchronized void validateSubmissionTime(UnixSeconds submissionTime) throws GameServerException {
+        UnixSeconds turnStart = currentTurnStartTime.get();
         if (turnStart == null || submissionTime.isBefore(turnStart) ||
                 submissionTime.isAfter(turnStart.plusSeconds(timeout))) {
             throw new GameServerException(ErrorType.SUBMISSION_OUT_OF_TIME);
@@ -118,10 +119,10 @@ public class Game {
     }
 
     private void broadCastCurrentTurn() throws GameServerException {
-        currentTurnStartTime.set(LocalDateTime.now());
+        currentTurnStartTime.set(UnixSeconds.now());
         int currentDrawer = getCurrentDrawer();
         boolean isGuessTurn = (currentDrawer == guesserId);
-        Event event = new ServerTurnChangeEvent(currentDrawer, currentTurnStartTime.get(), isGuessTurn);
+        Event event = new ServerTurnChangeEvent(currentDrawer, currentTurnStartTime.get().toLong(), isGuessTurn);
         Message message = new Message(SERVER_TURN_CHANGE_EVENT, event);
         room.broadcast(message);
     }
