@@ -11,18 +11,12 @@ import exception.GameServerException;
 import message.Message;
 import util.UnixSeconds;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static message.MessageType.*;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Game {
     private final Room room;
@@ -31,8 +25,7 @@ public class Game {
     private final List<Integer> order;
     private final Map<Integer, List<DrawElementInfo>> drawingMap = new ConcurrentHashMap<>();
     private final int timeout;
-    private final AtomicReference<Integer> currentOrder = new AtomicReference<>(-1);
-    private final AtomicReference<UnixSeconds> currentTurnStartTime = new AtomicReference<>();
+    private final UnixSeconds gameStartTime = UnixSeconds.now();
     private String submittedAnswer = "";
 
     public Game(Room room, String topic, int guesserId, List<Integer> order, int timeout) {
@@ -45,7 +38,7 @@ public class Game {
 
     public void startGame() throws GameServerException {
         broadCastGameStartEvent();
-        Thread thread = new Thread(this::rotateTurns);
+        Thread thread = new Thread(this::broadCastTurns);
         thread.start();
     }
 
@@ -55,33 +48,36 @@ public class Game {
         room.broadcast(message);
     }
 
-    private int getCurrentDrawer() {
-        return order.get(currentOrder.get());
+    private int getDrawerOfOrder(int i) {
+        return order.get(i);
     }
 
     public void drawBy(int drawer, DrawElementInfo drawing, long submissionTime) throws GameServerException {
-/*        validateSubmissionTime(UnixSeconds.from(submissionTime));
-        if (currentOrder.get()>=order.size() || getCurrentDrawer() != drawer) {
-            throw new GameServerException(ErrorType.DRAWER_OUT_OF_ORDER);
-        }*/ //TODO 과거에서 날라왔을 수 있으므로 submitTime 보고 어떤 유저인지 계산해서 검증하는 식으로 바꾸기
+        validateSubmissionTime(drawer, UnixSeconds.from(submissionTime));
         List<DrawElementInfo> drawingList = drawingMap.getOrDefault(drawer, new ArrayList<>());
         drawingList.add(drawing);
         drawingMap.put(drawer, drawingList);
         broadCastDrawingEvent(drawer, drawing);
     }
 
-    public void guess(int from, String submittedAnswer, long submissionTime) throws GameServerException {
-        //validateSubmissionTime(submissionTime);
+    public void guess(int from, String submittedAnswer) throws GameServerException {
         if (from != guesserId) {
             throw new GameServerException(ErrorType.GUESS_FROM_NONE_GUESSER);
         }
         this.submittedAnswer = submittedAnswer;
+        finishGame();
     }
 
-    private synchronized void validateSubmissionTime(UnixSeconds submissionTime) throws GameServerException {
-        UnixSeconds turnStart = currentTurnStartTime.get();
-        if (turnStart == null || submissionTime.isBefore(turnStart) ||
-                submissionTime.isAfter(turnStart.plusSeconds(timeout))) {
+    private synchronized void validateSubmissionTime(int submitterId, UnixSeconds submissionTime) throws GameServerException {
+        int submitterTurnIndex = order.indexOf(submitterId);
+        if (submitterTurnIndex == -1) {
+            throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+        }
+
+        UnixSeconds submitterTurnStart = gameStartTime.plusSeconds((long) submitterTurnIndex * timeout);
+        UnixSeconds submitterTurnEnd = submitterTurnStart.plusSeconds(timeout);
+
+        if (submissionTime.isBefore(submitterTurnStart) || submissionTime.isAfter(submitterTurnEnd)) {
             throw new GameServerException(ErrorType.SUBMISSION_OUT_OF_TIME);
         }
     }
@@ -89,45 +85,37 @@ public class Game {
     private void broadCastDrawingEvent(int drawer, DrawElementInfo drawing) throws GameServerException {
         Event event = new ServerDrawEvent(drawer, drawing);
         Message message = new Message(SERVER_DRAW_EVENT, event);
-        //room.broadcastTo(message, order.subList(0, currentOrder.get()));
         room.broadcast(message);
     }
 
-    private void rotateTurns() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        for(int i = 0; i < order.size(); i++) {
-            scheduler.schedule(this::changeTurn, (long) timeout * i, TimeUnit.SECONDS);
-        }
-        scheduler.shutdown(); // 타이머 종료
-    }
-
-    public void finishGame() {
+    private void broadCastTurns() {
         try {
-            broadCastFinish();
+            for (int i = 0; i < order.size(); i++) {
+                broadCastTurnOf(i); // 현재 턴의 브로드캐스트
+                Thread.sleep(timeout * 1000L); // 다음 턴까지 대기
+            }
         } catch (GameServerException | InterruptedException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // 예외 처리
         }
     }
 
-    private void changeTurn() {
-        currentOrder.getAndUpdate(i -> i + 1);
-        try {
-            broadCastCurrentTurn();
-        } catch (GameServerException e) {
-            throw new RuntimeException(e);
-        }
+    private boolean isGuessTurn(int i) {
+        return i == order.size() - 1;
     }
 
-    private void broadCastCurrentTurn() throws GameServerException {
-        currentTurnStartTime.set(UnixSeconds.now());
-        int currentDrawer = getCurrentDrawer();
-        boolean isGuessTurn = (currentDrawer == guesserId);
-        Event event = new ServerTurnChangeEvent(currentDrawer, currentTurnStartTime.get().toLong(), isGuessTurn);
+    private void broadCastTurnOf(int turnIndex) throws GameServerException {
+        UnixSeconds currentTurnStartTime = gameStartTime.plusSeconds((long) timeout * turnIndex);
+        int currentDrawer = getDrawerOfOrder(turnIndex); // 현재 턴의 Drawer 계산
+        Event event = new ServerTurnChangeEvent(currentDrawer, currentTurnStartTime.toLong(), isGuessTurn(turnIndex));
         Message message = new Message(SERVER_TURN_CHANGE_EVENT, event);
         room.broadcast(message);
     }
 
-    private void broadCastFinish() throws GameServerException, InterruptedException {
+    private void finishGame() throws GameServerException {
+        broadCastFinish();
+    }
+
+    private void broadCastFinish() throws GameServerException {
         Event event = new ServerFinishGameEvent(topic, submittedAnswer, drawingMap);
         Message message = new Message(SERVER_FINISH_GAME_EVENT, event);
         room.broadcast(message);
