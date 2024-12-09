@@ -96,7 +96,7 @@ public class MessageHandler {
     private void handleJoinRoomEvent(ClientJoinRoomEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        broadCastRoomUpdateEvent(room);
+        room.broadCastRoomUpdateEvent();
     }
 
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
@@ -105,13 +105,13 @@ public class MessageHandler {
             throw new GameServerException(ErrorType.UNAUTHORIZED);
         }
         room.changeSettings(request.getDrawTimeLimit(), request.getParticipantLimit());
-        broadCastRoomUpdateEvent(room);
+        room.broadCastRoomUpdateEvent();
     }
 
     private void handleGameReadyEvent(ClientReadyEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomId());
         room.setReady(from.getId(), request.getIsReady());
-        broadCastRoomUpdateEvent(room);
+        room.broadCastRoomUpdateEvent();
         room.tryToStart();
     }
 
@@ -149,11 +149,5 @@ public class MessageHandler {
     private void handleVoteEvent(ClientVoteEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomId());
         room.vote(request.getVoteUser(), from.getId());
-    }
-
-    private void broadCastRoomUpdateEvent(Room room) {
-        Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(room));
-        Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
-        broadcastIn(message, room);
     }
 }

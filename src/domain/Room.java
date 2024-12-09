@@ -151,7 +151,7 @@ public class Room {
         throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
     }
 
-    private void broadCastRoomUpdateEvent() throws GameServerException {
+    public void broadCastRoomUpdateEvent() throws GameServerException {
         Event event = new ServerRoomUpdateEvent(RoomMapper.toRoomInfo(this));
         Message message = new Message(SERVER_ROOM_UPDATE_EVENT, event);
         broadcast(message);
