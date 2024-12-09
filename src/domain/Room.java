@@ -67,7 +67,7 @@ public class Room {
                 setNewRandomOwner();
             }
         } catch (GameServerException e) {
-            if(e.getErrorType() != ErrorType.OWNER_SELECT_FAILED) {
+            if(!e.getErrorType().equals(ErrorType.OWNER_SELECT_FAILED)) {
                 throw e;
             }
         }
