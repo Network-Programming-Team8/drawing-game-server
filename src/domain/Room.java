@@ -145,12 +145,11 @@ public class Room {
         return userMap.size();
     }
 
-    //TODO ServerEventListener 만들어서 Sender 대신 주입, 아래 중복 책임 담당하도록 바꾸기
-    private void sendTo(Message message, User to) {
-        sender.send(message, to.getId());
-    }
     void broadcast(Message message) throws GameServerException {
         broadcastTo(message, this.getUserList().stream().map(User::getId).toList());
+    }
+    void broadcastExcept(Message message, User except) throws GameServerException {
+        broadcastTo(message, this.getUserList().stream().filter(user -> !user.equals(except)).map(User::getId).toList());
     }
     void broadcastTo(Message message, List<Integer> idList) throws GameServerException {
         if( idList.stream().allMatch(this::isThereUser)) {
