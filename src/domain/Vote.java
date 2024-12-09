@@ -1,5 +1,7 @@
 package domain;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
@@ -23,33 +25,33 @@ public class Vote {
 
     private final Room room;
     private final ConcurrentHashMap<Integer, Integer> voteStatus = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Integer> voteCount = new ConcurrentHashMap<>();
-    private long voteEndTime;
     private static final int VOTE_TIME_LIMIT = 30;
-    private final AtomicBoolean isAcceptingVote = new AtomicBoolean(false);
+    private final AtomicBoolean isVoteEnd = new AtomicBoolean(false);
 
     public Vote(Room room){
         this.room = room;
     }
 
     public void startVote() throws GameServerException {
-        voteEndTime = UnixSeconds.now().plusSeconds(VOTE_TIME_LIMIT).toLong();
-        isAcceptingVote.set(true);
         requestVote();
-
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.schedule(this::finishVote, VOTE_TIME_LIMIT, TimeUnit.SECONDS);
+        Thread thread = new Thread(this::voteTimer);
+        thread.start();
     }
 
     private void requestVote() throws GameServerException {
-        Event event = new ServerRequestVoteEvent(voteEndTime);
+        Event event = new ServerRequestVoteEvent(UnixSeconds.now().plusSeconds(VOTE_TIME_LIMIT).toLong());
         Message message = new Message(MessageType.SERVER_REQUEST_VOTE_EVENT, event);
         room.broadcast(message);
     }
 
+    private void voteTimer() {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(this::finishVote, VOTE_TIME_LIMIT, TimeUnit.SECONDS);
+    }
+
     private void finishVote() {
-        isAcceptingVote.set(false);
-        Event event = new ServerFinishVoteEvent(new VoteInfo(voteCount));
+        isVoteEnd.set(true);
+        Event event = new ServerFinishVoteEvent(calculateVoteInfo());
         Message message = new Message(MessageType.SERVER_FINISH_VOTE_EVENT, event);
         try{
             room.broadcast(message);
@@ -58,30 +60,33 @@ public class Vote {
         }
     }
 
-    public synchronized void vote(int voter, int voteTo) throws GameServerException {
-        if (!isAcceptingVote.get()){
+    public synchronized void vote(int to, int from) throws GameServerException {
+        if (isVoteEnd()){
             throw new GameServerException(ErrorType.NOT_ACCEPTING_VOTE);
         }
         else{
-            updateVote(voter, voteTo);
-            broadCastVoteEvent();
+            voteStatus.put(from, to);
+            broadCastVoteEvents();
         }
     }
 
-    private synchronized void updateVote(int voter, int voteTo) {
-        voteStatus.keySet().forEach(userId -> voteCount.putIfAbsent(userId, 0));
-
-        Integer previousVote = voteStatus.put(voter, voteTo);
-        if (previousVote != null) {
-            voteCount.compute(previousVote, (key, value) -> value == null ? 0 : value - 1);
-        }
-        voteCount.compute(voteTo, (key, value) -> value == null ? 1 : value + 1);
-    }
-
-
-    private void broadCastVoteEvent() throws GameServerException {
-        Event event = new ServerVoteEvent(new VoteInfo(voteCount));
+    private void broadCastVoteEvents() throws GameServerException {
+        Event event = new ServerVoteEvent(calculateVoteInfo());
         Message message = new Message(SERVER_VOTE_EVENT, event);
         room.broadcast(message);
     }
+
+    private synchronized VoteInfo calculateVoteInfo() {
+        Map<Integer, Integer> voteCount = new HashMap<>();
+        for (Integer userId : room.getUserIdList()) {
+            voteCount.put(userId, 0);
+        }
+        for (Map.Entry<Integer, Integer> entry : voteStatus.entrySet()) {
+            Integer votedFor = entry.getValue();
+            voteCount.put(votedFor, voteCount.get(votedFor) + 1);
+        }
+        return new VoteInfo(voteCount);
+    }
+
+    public boolean isVoteEnd() { return isVoteEnd.get(); }
 }
