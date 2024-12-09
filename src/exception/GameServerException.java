@@ -1,6 +1,7 @@
 package exception;
 
 public class GameServerException extends Exception {
+    private ErrorType errorType;
 
     public GameServerException(ErrorType errorType) {
         super(errorType.toString());
@@ -16,5 +17,9 @@ public class GameServerException extends Exception {
 
     public GameServerException(ErrorType errorType, Throwable cause) {
         super(errorType.toString(), cause);
+    }
+
+    public ErrorType getErrorType() {
+        return errorType;
     }
 }

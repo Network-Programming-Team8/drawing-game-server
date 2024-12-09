@@ -62,8 +62,14 @@ public class Room {
             throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
         }
         User user = userMap.get(userId);
-        if(user.equals(owner)) {
-            setNewRandomOwner();
+        try {
+            if (user.equals(owner)) {
+                setNewRandomOwner();
+            }
+        } catch (GameServerException e) {
+            if(e.getErrorType() != ErrorType.OWNER_SELECT_FAILED) {
+                throw e;
+            }
         }
         user.leaveRoom();
         userMap.remove(userId);
