@@ -5,7 +5,6 @@ import static message.MessageType.*;
 import domain.Game;
 import domain.User;
 import domain.Room;
-import mapper.RoomMapper;
 import manager.GameRoomManager;
 import network.Sender;
 import message.Message;
@@ -112,13 +111,13 @@ public class MessageHandler {
         Room room = roomManager.getRoom(from.getRoomId());
         room.setReady(from.getId(), request.getIsReady());
         room.broadCastRoomUpdateEvent();
-        room.tryToStart();
+        room.tryToStartGame();
     }
 
     private void handleVoteReadyEvent(ClientReadyEvent request, User from) throws GameServerException, InterruptedException {
         Room room = roomManager.getRoom(from.getRoomId());
         room.setVoteReady(from.getId(), request.getIsReady());
-        room.tryToVoteStart();
+        room.tryToStartVote();
     }
 
     private void handleExitRoomEvent(ClientExitRoomEvent request, User from) throws GameServerException {
