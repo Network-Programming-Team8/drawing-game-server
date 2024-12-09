@@ -5,6 +5,7 @@ public class GameServerException extends Exception {
 
     public GameServerException(ErrorType errorType) {
         super(errorType.toString());
+        this.errorType = errorType;
     }
 
     public GameServerException(ErrorType errorType, String additionalMessage) {
