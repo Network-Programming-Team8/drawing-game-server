@@ -71,7 +71,10 @@ public class Room {
         broadCastRoomUpdateEvent();
     }
 
-    private synchronized void setNewRandomOwner() {
+    private synchronized void setNewRandomOwner() throws GameServerException {
+        if(userMap.size() == 1) {
+            throw new GameServerException(ErrorType.OWNER_SELECT_FAILED);
+        }
         owner = Utils.selectRandomlyFrom(
                 userMap.values().stream()
                         .filter(u -> !u.equals(owner)

@@ -19,6 +19,7 @@ public enum ErrorType {
     ROOM_NOT_FOUND("E200", "The room with the given ID does not exist."),
     ROOM_CREATION_FAILED("E201", "Failed to create the room."),
     ROOM_JOIN_FAILED("E202", "Failed to join the room."),
+    OWNER_SELECT_FAILED("E203", "The room has only one member and cannot assign a new owner."),
 
     // **User Errors**
     USER_CREATION_FAILED("E300", "Failed to create the user."),
