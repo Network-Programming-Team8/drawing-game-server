@@ -1,7 +1,8 @@
 package network;
 
-import exception.ConnectionError;
+import exception.ConnectionException;
 import exception.ErrorType;
+import exception.ExceptionHandler;
 import handler.MessageHandler;
 import manager.ConnectionManager;
 
@@ -16,11 +17,14 @@ public class ConnectionListener {
     private final ConnectionManager connectionManager;
     private final Sender sender;
     private final MessageHandler messageHandler;
+    private final ExceptionHandler exceptionHandler;
 
-    public ConnectionListener(ConnectionManager connectionManager, Sender sender, MessageHandler messageHandler){
+    public ConnectionListener(ConnectionManager connectionManager, Sender sender,
+                              MessageHandler messageHandler, ExceptionHandler exceptionHandler){
         this.connectionManager = connectionManager;
         this.sender = sender;
         this.messageHandler = messageHandler;
+        this.exceptionHandler = exceptionHandler;
     }
 
     public void waitForConnections(){
@@ -31,21 +35,22 @@ public class ConnectionListener {
                 Socket socket = server.accept();
                 int connectionId = connect(socket);
                 Thread connectionThread = new Thread(
-                        new ConnectionRunner(connectionId, connectionManager, sender, messageHandler));
+                        new ConnectionRunner(connectionId, connectionManager, sender,
+                                messageHandler, exceptionHandler));
                 connectionThread.start();
             }
-        } catch (Exception ex){
-            System.err.println("서버 소켓 생성 및 클라이언트의 접속 대기 중 오류");
+        } catch (Exception e){
+            exceptionHandler.handle(e);
         }
     }
 
-    private int connect(Socket socket) throws ConnectionError {
+    private int connect(Socket socket) throws ConnectionException {
         try {
             ObjectOutputStream toClient = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream fromClient = new ObjectInputStream(socket.getInputStream());
             return connectionManager.addConnection(toClient, fromClient);
         } catch (IOException e) {
-            throw new ConnectionError(ErrorType.FAILED_TO_CONNECT);
+            throw new ConnectionException(ErrorType.FAILED_TO_CONNECT);
         }
     }
 }

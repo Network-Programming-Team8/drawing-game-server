@@ -1,5 +1,6 @@
 package main;
 
+import exception.ExceptionHandler;
 import handler.MessageHandler;
 import network.ConnectionListener;
 import manager.GameRoomManager;
@@ -12,8 +13,9 @@ public class GameMain {
         GameRoomManager gameRoomManager = new GameRoomManager();
         ConnectionManager connectionManager = new ConnectionManager(gameRoomManager);
         Sender sender = new Sender(connectionManager);
-        MessageHandler messageHandler = new MessageHandler(gameRoomManager, sender);
-        ConnectionListener cl = new ConnectionListener(connectionManager, sender, messageHandler);
+        ExceptionHandler exceptionHandler = new ExceptionHandler(sender, connectionManager);
+        MessageHandler messageHandler = new MessageHandler(gameRoomManager, sender, exceptionHandler);
+        ConnectionListener cl = new ConnectionListener(connectionManager, sender, messageHandler, exceptionHandler);
         cl.waitForConnections();
     }
 }

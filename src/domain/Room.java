@@ -3,6 +3,7 @@ package domain;
 import dto.event.Event;
 import dto.event.server.ServerRoomUpdateEvent;
 import exception.ErrorType;
+import exception.ExceptionHandler;
 import exception.GameServerException;
 import mapper.RoomMapper;
 import message.Message;
@@ -25,16 +26,20 @@ public class Room {
     private final Map<Integer, Boolean> readyStatusMap = new ConcurrentHashMap<>();
     private final Map<Integer, Boolean> voteReadyStatusMap = new ConcurrentHashMap<>();
     private final Sender sender;
-    private final GameSetter gameSetter = new GameSetter(this);
+    private final GameSetter gameSetter;
+    private final ExceptionHandler exceptionHandler;
 
-    public Room(int id, int drawTimeLimit, int participantLimit, User owner, Sender sender) throws GameServerException {
+    public Room(int id, int drawTimeLimit, int participantLimit, User owner, Sender sender,
+                ExceptionHandler exceptionHandler1) throws GameServerException {
         this.id = id;
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
         this.owner = owner;
         this.sender = sender;
+        this.exceptionHandler = exceptionHandler1;
         this.vote = new Vote(this);
         this.chat = new Chat(this);
+        this.gameSetter = new GameSetter(this);
         addUser(owner);
     }
 
@@ -183,5 +188,9 @@ public class Room {
 
     public int getOwnerId() {
         return owner.getId();
+    }
+
+    public void handleException(Exception e) {
+        exceptionHandler.handle(e, getUserIdList());
     }
 }

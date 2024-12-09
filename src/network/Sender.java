@@ -1,6 +1,6 @@
 package network;
 
-import exception.ConnectionError;
+import exception.ConnectionException;
 import exception.ErrorType;
 import message.Message;
 import manager.ConnectionManager;
@@ -16,12 +16,12 @@ public class Sender {
         this.connectionManager = connectionManager;
     }
 
-    private void send(Message message, ObjectOutputStream os) throws ConnectionError {
+    private void send(Message message, ObjectOutputStream os) throws ConnectionException {
         synchronized (os) { // ObjectOutputStream에 동기화 적용
             try {
                 os.writeObject(message);
             } catch (IOException e) {
-                throw new ConnectionError(ErrorType.MESSAGE_SEND_ERROR);
+                throw new ConnectionException(ErrorType.MESSAGE_SEND_ERROR);
             }
             System.out.println(message.getType());
             System.out.println(message.getMsgDTO());
@@ -33,7 +33,7 @@ public class Sender {
         ObjectOutputStream os = connectionManager.getOutputStream(id);
         try {
             send(message, os);
-        } catch (ConnectionError e) {
+        } catch (ConnectionException e) {
             System.err.println("메시지 송신 불가: 클라이언트와 연결이 끊어졌습니다.");
             connectionManager.closeConnection(id);
         }

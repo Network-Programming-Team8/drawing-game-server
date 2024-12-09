@@ -56,7 +56,7 @@ public class Vote {
         try{
             room.broadcast(message);
         } catch (GameServerException e){
-            throw new RuntimeException(e);
+            room.handleException(e);
         }
     }
 

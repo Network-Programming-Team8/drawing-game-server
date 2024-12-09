@@ -7,6 +7,7 @@ import dto.event.server.ServerStartGameEvent;
 import dto.event.server.ServerTurnChangeEvent;
 import dto.info.DrawElementInfo;
 import exception.ErrorType;
+import exception.ExceptionHandler;
 import exception.GameServerException;
 import message.Message;
 import util.UnixSeconds;
@@ -94,8 +95,11 @@ public class Game {
                 broadCastTurnOf(i); // 현재 턴의 브로드캐스트
                 Thread.sleep(timeout * 1000L); // 다음 턴까지 대기
             }
-        } catch (GameServerException | InterruptedException e) {
-            e.printStackTrace(); // 예외 처리
+        } catch (GameServerException e) {
+            room.handleException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            room.handleException(new GameServerException(ErrorType.SYSTEM_FAILURE, "Game rotation interrupted"));
         }
     }
 

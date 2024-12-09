@@ -6,6 +6,7 @@ import static message.MessageType.*;
 
 import domain.User;
 import exception.ErrorType;
+import exception.ExceptionHandler;
 import manager.ConnectionManager;
 import handler.MessageHandler;
 import message.Message;
@@ -18,14 +19,17 @@ import exception.GameServerException;
 public class ConnectionRunner implements Runnable{
     private final ConnectionManager connectionManager;
     private final MessageHandler messageHandler;
+    private final ExceptionHandler exceptionHandler;
     private final Sender sender;
     private final int id;
 
-    public ConnectionRunner(int id, ConnectionManager connectionManager, Sender sender, MessageHandler messageHandler){
+    public ConnectionRunner(int id, ConnectionManager connectionManager, Sender sender,
+                            MessageHandler messageHandler, ExceptionHandler exceptionHandler){
         this.connectionManager = connectionManager;
         this.sender = sender;
         this.messageHandler = messageHandler;
         this.id = id;
+        this.exceptionHandler = exceptionHandler;
     }
 
     private void closeConnection() {
@@ -45,13 +49,6 @@ public class ConnectionRunner implements Runnable{
 
     private void sendMessageToClient(Message message) {
         sender.send(message, id);
-    }
-
-    private void sendAndLogErrorMessage(Exception e) {
-        String errorMessage = e.getMessage();
-        Message message = new Message(SERVER_ERROR_EVENT, new ServerErrorEvent(errorMessage));
-        sendMessageToClient(message);
-        System.err.println("에러 메세지 송신됨: " + errorMessage);
     }
 
     private void handleMessageWith(User user) throws GameServerException, InterruptedException {
@@ -83,14 +80,14 @@ public class ConnectionRunner implements Runnable{
             try {
                 register();
             } catch (GameServerException e) {
-                sendAndLogErrorMessage(e);
+                exceptionHandler.handle(e, id);
             }
         }
         while(connectionManager.hasConnection(id)){
             try {
                 handleMessageWith(connectionManager.getUser(id));
             } catch (GameServerException | InterruptedException e) {
-                sendAndLogErrorMessage(e);
+                exceptionHandler.handle(e, id);
             }
         }
         closeConnection();

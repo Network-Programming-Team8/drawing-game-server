@@ -5,6 +5,7 @@ import static message.MessageType.*;
 import domain.Game;
 import domain.User;
 import domain.Room;
+import exception.ExceptionHandler;
 import manager.GameRoomManager;
 import network.Sender;
 import message.Message;
@@ -17,10 +18,12 @@ import exception.GameServerException;
 public class MessageHandler {
     private final GameRoomManager roomManager;
     private final Sender sender;
+    private final ExceptionHandler exceptionHandler;
 
-    public MessageHandler(GameRoomManager roomManager, Sender sender){
+    public MessageHandler(GameRoomManager roomManager, Sender sender, ExceptionHandler exceptionHandler){
         this.roomManager = roomManager;
         this.sender = sender;
+        this.exceptionHandler = exceptionHandler;
     }
 
     public void handle(Message msg, User from) throws GameServerException, InterruptedException {
@@ -84,9 +87,10 @@ public class MessageHandler {
 
     private void handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
-            throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "참가자 수와 제한 시간은 양수여야 합니다.");
+            throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "participants and time limit have to be positive integer");
         }
-        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from, sender);
+        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(),
+                from, sender, exceptionHandler);
         Event event = new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit(), room.getOwnerId());
         Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
         sendTo(message, from);
