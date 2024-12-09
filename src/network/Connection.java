@@ -1,6 +1,7 @@
-package domain;
+package network;
 
-import exception.ErrorType;
+import domain.User;
+import exception.ExceptionType;
 import exception.GameServerException;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class Connection {
 
     public User getUser() throws GameServerException {
         if(!hasUser()) {
-            throw new GameServerException(ErrorType.UNKNOWN_ERROR);
+            throw new GameServerException(ExceptionType.UNKNOWN_ERROR);
         }
         return user;
     }

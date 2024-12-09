@@ -4,10 +4,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import domain.User;
 import domain.Room;
-import domain.Vote;
 import exception.ExceptionHandler;
 import exception.GameServerException;
-import exception.ErrorType;
+import exception.ExceptionType;
 import network.Sender;
 
 public class GameRoomManager {
@@ -20,20 +19,20 @@ public class GameRoomManager {
             gameRoomMap.put(lastID, newRoom);
             return newRoom;
         } catch (Exception e) {
-            throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, e);
+            throw new GameServerException(ExceptionType.ROOM_CREATION_FAILED, e);
         }
     }
 
     public Room getRoom(int roomID) throws GameServerException {
         if (!gameRoomMap.containsKey(roomID)) {
-            throw new GameServerException(ErrorType.ROOM_NOT_FOUND);
+            throw new GameServerException(ExceptionType.ROOM_NOT_FOUND);
         }
         return gameRoomMap.get(roomID);
     }
 
     public void deleteRoom(int roomID) throws GameServerException {
         if (!gameRoomMap.containsKey(roomID)) {
-            throw new GameServerException(ErrorType.ROOM_NOT_FOUND);
+            throw new GameServerException(ExceptionType.ROOM_NOT_FOUND);
         }
         gameRoomMap.remove(roomID);
     }

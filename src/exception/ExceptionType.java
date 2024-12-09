@@ -1,6 +1,6 @@
 package exception;
 
-public enum ErrorType {
+public enum ExceptionType {
 
     // **General Errors**
     UNKNOWN_ERROR("E000", "An unknown error occurred."),
@@ -45,7 +45,7 @@ public enum ErrorType {
     private final String errorCode;
     private final String errorMessage;
 
-    ErrorType(String errorCode, String errorMessage) {
+    ExceptionType(String errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }

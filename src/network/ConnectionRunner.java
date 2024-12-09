@@ -5,7 +5,7 @@ import java.io.IOException;
 import static message.MessageType.*;
 
 import domain.User;
-import exception.ErrorType;
+import exception.ExceptionType;
 import exception.ExceptionHandler;
 import manager.ConnectionManager;
 import message.MessageHandler;
@@ -41,7 +41,7 @@ public class ConnectionRunner implements Runnable{
             message = (Message) connectionManager.getInputStream(id).readObject();
             System.out.println("메세지 수신됨: " + message.getType());
         } catch (IOException | ClassNotFoundException e) {
-            throw new GameServerException(ErrorType.MESSAGE_RECEIVE_ERROR);
+            throw new GameServerException(ExceptionType.MESSAGE_RECEIVE_ERROR);
         }
         return message;
     }
@@ -59,7 +59,7 @@ public class ConnectionRunner implements Runnable{
         Message msgFromClient = getMessageFromClient();
 
         if(msgFromClient.getType() != CLIENT_LOGIN_EVENT) {
-            throw new GameServerException(ErrorType.INVALID_INPUT, "최초 메세지는 로그인 요청이어야 합니다.");
+            throw new GameServerException(ExceptionType.INVALID_INPUT, "최초 메세지는 로그인 요청이어야 합니다.");
         }
 
         ClientLoginEvent clientLoginEvent = (ClientLoginEvent) msgFromClient.getMsgDTO();

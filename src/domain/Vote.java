@@ -15,7 +15,7 @@ import dto.event.server.ServerVoteEvent;
 import dto.info.VoteInfo;
 import message.Message;
 import message.MessageType;
-import exception.ErrorType;
+import exception.ExceptionType;
 import exception.GameServerException;
 import util.UnixSeconds;
 
@@ -62,7 +62,7 @@ public class Vote {
 
     public synchronized void vote(int to, int from) throws GameServerException {
         if (isVoteEnd()){
-            throw new GameServerException(ErrorType.NOT_ACCEPTING_VOTE);
+            throw new GameServerException(ExceptionType.NOT_ACCEPTING_VOTE);
         }
         else{
             voteStatus.put(from, to);

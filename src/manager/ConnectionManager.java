@@ -5,7 +5,7 @@ import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import domain.Connection;
+import network.Connection;
 import domain.User;
 import exception.GameServerException;
 

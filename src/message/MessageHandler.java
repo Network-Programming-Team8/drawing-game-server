@@ -11,7 +11,7 @@ import network.Sender;
 import dto.event.Event;
 import dto.event.client.*;
 import dto.event.server.*;
-import exception.ErrorType;
+import exception.ExceptionType;
 import exception.GameServerException;
 
 public class MessageHandler {
@@ -27,7 +27,7 @@ public class MessageHandler {
 
     public void handle(Message msg, User from) throws GameServerException, InterruptedException {
         if(msg.getMsgDTO() == null) {
-            throw new GameServerException(ErrorType.EVENT_IS_NULL);
+            throw new GameServerException(ExceptionType.EVENT_IS_NULL);
         }
         switch(msg.getType()){
             case CLIENT_CREATE_ROOM_EVENT:
@@ -86,7 +86,7 @@ public class MessageHandler {
 
     private void handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
-            throw new GameServerException(ErrorType.ROOM_CREATION_FAILED, "participants and time limit have to be positive integer");
+            throw new GameServerException(ExceptionType.ROOM_CREATION_FAILED, "participants and time limit have to be positive integer");
         }
         Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(),
                 from, sender, exceptionHandler);
@@ -104,7 +104,7 @@ public class MessageHandler {
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(from.getRoomId());
         if(!room.canChangeSettings(from)) {
-            throw new GameServerException(ErrorType.UNAUTHORIZED);
+            throw new GameServerException(ExceptionType.UNAUTHORIZED);
         }
         room.changeSettings(request.getDrawTimeLimit(), request.getParticipantLimit());
         room.broadCastRoomUpdateEvent();

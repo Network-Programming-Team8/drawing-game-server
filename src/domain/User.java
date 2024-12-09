@@ -1,6 +1,6 @@
 package domain;
 
-import exception.ErrorType;
+import exception.ExceptionType;
 import exception.GameServerException;
 
 public class User {
@@ -24,21 +24,21 @@ public class User {
 
     public int getRoomId() throws GameServerException {
         if( !isInRoom() ) {
-            throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+            throw new GameServerException(ExceptionType.USER_IS_NOT_IN_ROOM);
         }
         return roomID;
     }
 
     public void joinRoom(int roomId) throws GameServerException{
         if( isInRoom() ) {
-            throw new GameServerException(ErrorType.USER_ALREADY_IN_ROOM);
+            throw new GameServerException(ExceptionType.USER_ALREADY_IN_ROOM);
         }
         this.roomID = roomId;
     }
 
     public void leaveRoom() throws GameServerException {
         if( !isInRoom() ) {
-            throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+            throw new GameServerException(ExceptionType.USER_IS_NOT_IN_ROOM);
         }
         roomID = null;
     }

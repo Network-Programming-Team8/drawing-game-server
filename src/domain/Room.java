@@ -2,7 +2,7 @@ package domain;
 
 import dto.event.Event;
 import dto.event.server.ServerRoomUpdateEvent;
-import exception.ErrorType;
+import exception.ExceptionType;
 import exception.ExceptionHandler;
 import exception.GameServerException;
 import mapper.RoomMapper;
@@ -50,7 +50,7 @@ public class Room {
 
     public void addUser(User user) throws GameServerException {
         if(userMap.size() == participantLimit) {
-            throw new GameServerException(ErrorType.ROOM_JOIN_FAILED,
+            throw new GameServerException(ExceptionType.ROOM_JOIN_FAILED,
                     String.format("Room is full (max: %d)", participantLimit));
         }
         userMap.put(user.getId(), user);
@@ -64,7 +64,7 @@ public class Room {
 
     public synchronized void deleteUser(int userId) throws GameServerException {
         if (!isThereUser(userId)) {
-            throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+            throw new GameServerException(ExceptionType.USER_IS_NOT_IN_ROOM);
         }
         User user = userMap.get(userId);
         try {
@@ -72,7 +72,7 @@ public class Room {
                 setNewRandomOwner();
             }
         } catch (GameServerException e) {
-            if(!e.getErrorType().equals(ErrorType.OWNER_SELECT_FAILED)) {
+            if(!e.getErrorType().equals(ExceptionType.OWNER_SELECT_FAILED)) {
                 throw e;
             }
         }
@@ -84,7 +84,7 @@ public class Room {
 
     private synchronized void setNewRandomOwner() throws GameServerException {
         if(userMap.size() == 1) {
-            throw new GameServerException(ErrorType.OWNER_SELECT_FAILED);
+            throw new GameServerException(ExceptionType.OWNER_SELECT_FAILED);
         }
         owner = Utils.selectRandomlyFrom(
                 userMap.values().stream()
@@ -161,7 +161,7 @@ public class Room {
             sender.sendToAll(message, idList);
             return;
         }
-        throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+        throw new GameServerException(ExceptionType.USER_IS_NOT_IN_ROOM);
     }
 
     public void broadCastRoomUpdateEvent() throws GameServerException {

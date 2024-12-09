@@ -2,8 +2,7 @@ package domain;
 
 import dto.event.Event;
 import dto.event.server.ServerRequestTopicEvent;
-import exception.ErrorType;
-import exception.ExceptionHandler;
+import exception.ExceptionType;
 import exception.GameServerException;
 import message.Message;
 
@@ -51,7 +50,7 @@ public class GameSetter {
 
     public Game getGame() throws GameServerException {
         if (game == null) {
-            throw new GameServerException(ErrorType.NO_GAME_RUNNING);
+            throw new GameServerException(ExceptionType.NO_GAME_RUNNING);
         }
         return game;
     }

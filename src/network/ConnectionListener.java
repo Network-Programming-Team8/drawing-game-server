@@ -1,7 +1,7 @@
 package network;
 
 import exception.ConnectionException;
-import exception.ErrorType;
+import exception.ExceptionType;
 import exception.ExceptionHandler;
 import message.MessageHandler;
 import manager.ConnectionManager;
@@ -50,7 +50,7 @@ public class ConnectionListener {
             ObjectInputStream fromClient = new ObjectInputStream(socket.getInputStream());
             return connectionManager.addConnection(toClient, fromClient);
         } catch (IOException e) {
-            throw new ConnectionException(ErrorType.FAILED_TO_CONNECT);
+            throw new ConnectionException(ExceptionType.FAILED_TO_CONNECT);
         }
     }
 }

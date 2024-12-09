@@ -6,8 +6,7 @@ import dto.event.server.ServerFinishGameEvent;
 import dto.event.server.ServerStartGameEvent;
 import dto.event.server.ServerTurnChangeEvent;
 import dto.info.DrawElementInfo;
-import exception.ErrorType;
-import exception.ExceptionHandler;
+import exception.ExceptionType;
 import exception.GameServerException;
 import message.Message;
 import util.UnixSeconds;
@@ -63,7 +62,7 @@ public class Game {
 
     public void guess(int from, String submittedAnswer) throws GameServerException {
         if (from != guesserId) {
-            throw new GameServerException(ErrorType.GUESS_FROM_NONE_GUESSER);
+            throw new GameServerException(ExceptionType.GUESS_FROM_NONE_GUESSER);
         }
         this.submittedAnswer = submittedAnswer;
         finishGame();
@@ -72,14 +71,14 @@ public class Game {
     private synchronized void validateSubmissionTime(int submitterId, UnixSeconds submissionTime) throws GameServerException {
         int submitterTurnIndex = order.indexOf(submitterId);
         if (submitterTurnIndex == -1) {
-            throw new GameServerException(ErrorType.USER_IS_NOT_IN_ROOM);
+            throw new GameServerException(ExceptionType.USER_IS_NOT_IN_ROOM);
         }
 
         UnixSeconds submitterTurnStart = gameStartTime.plusSeconds((long) submitterTurnIndex * timeout);
         UnixSeconds submitterTurnEnd = submitterTurnStart.plusSeconds(timeout);
 
         if (submissionTime.isBefore(submitterTurnStart) || submissionTime.isAfter(submitterTurnEnd)) {
-            throw new GameServerException(ErrorType.SUBMISSION_OUT_OF_TIME);
+            throw new GameServerException(ExceptionType.SUBMISSION_OUT_OF_TIME);
         }
     }
 
@@ -99,7 +98,7 @@ public class Game {
             room.handleException(e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            room.handleException(new GameServerException(ErrorType.SYSTEM_FAILURE, "Game rotation interrupted"));
+            room.handleException(new GameServerException(ExceptionType.SYSTEM_FAILURE, "Game rotation interrupted"));
         }
     }
 

@@ -1,7 +1,7 @@
 package network;
 
 import exception.ConnectionException;
-import exception.ErrorType;
+import exception.ExceptionType;
 import message.Message;
 import manager.ConnectionManager;
 
@@ -21,7 +21,7 @@ public class Sender {
             try {
                 os.writeObject(message);
             } catch (IOException e) {
-                throw new ConnectionException(ErrorType.MESSAGE_SEND_ERROR);
+                throw new ConnectionException(ExceptionType.MESSAGE_SEND_ERROR);
             }
             System.out.println(message.getType());
             System.out.println(message.getMsgDTO());
