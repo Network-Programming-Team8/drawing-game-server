@@ -1,7 +1,7 @@
 package main;
 
 import exception.ExceptionHandler;
-import handler.MessageHandler;
+import message.MessageHandler;
 import network.ConnectionListener;
 import manager.GameRoomManager;
 import manager.ConnectionManager;

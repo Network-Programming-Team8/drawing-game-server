@@ -1,4 +1,4 @@
-package handler;
+package message;
 
 import static message.MessageType.*;
 
@@ -8,7 +8,6 @@ import domain.Room;
 import exception.ExceptionHandler;
 import manager.GameRoomManager;
 import network.Sender;
-import message.Message;
 import dto.event.Event;
 import dto.event.client.*;
 import dto.event.server.*;

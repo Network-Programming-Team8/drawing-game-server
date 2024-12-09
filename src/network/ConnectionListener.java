@@ -3,7 +3,7 @@ package network;
 import exception.ConnectionException;
 import exception.ErrorType;
 import exception.ExceptionHandler;
-import handler.MessageHandler;
+import message.MessageHandler;
 import manager.ConnectionManager;
 
 import java.io.IOException;

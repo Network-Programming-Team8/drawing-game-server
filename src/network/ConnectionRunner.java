@@ -8,11 +8,10 @@ import domain.User;
 import exception.ErrorType;
 import exception.ExceptionHandler;
 import manager.ConnectionManager;
-import handler.MessageHandler;
+import message.MessageHandler;
 import message.Message;
 import dto.event.client.ClientLoginEvent;
 import dto.event.server.ServerLoginEvent;
-import dto.event.server.ServerErrorEvent;
 import exception.GameServerException;
 
 
