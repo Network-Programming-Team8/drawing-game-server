@@ -46,7 +46,7 @@ public class Room {
     public void addUser(User user) throws GameServerException {
         if(userMap.size() == participantLimit) {
             throw new GameServerException(ErrorType.ROOM_JOIN_FAILED,
-                    String.format("방이 가득 찼습니다. (최대 인원: %d명)", participantLimit));
+                    String.format("Room is full (max: %d)", participantLimit));
         }
         userMap.put(user.getId(), user);
         readyStatusMap.put(user.getId(), false);
