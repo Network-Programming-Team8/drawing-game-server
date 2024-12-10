@@ -43,7 +43,7 @@ public enum ExceptionType {
     UNAUTHORIZED("E600", "An unauthorized user attempted to change the settings."),
 
     // **Message Errors**
-    UNKNOWN_EVENT_TYPE("E700", "Unsupported event type");
+    UNKNOWN_MESSAGE_TYPE("E700", "Unsupported event type");
 
     private final String errorCode;
     private final String errorMessage;
