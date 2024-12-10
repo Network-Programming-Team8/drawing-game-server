@@ -76,29 +76,16 @@ public class MessageHandler {
         }
     }
 
-    private void sendTo(Message message, User to) {
-        sender.send(message, to.getId());
-    }
-
-    private void broadcastIn(Message message, Room room) {
-        sender.sendToAll(message, room.getUserList().stream().map(User::getId).toList());
-    }
-
     private void handleCreateRoomEvent(ClientCreateRoomEvent request, User from) throws GameServerException {
         if (request.getParticipantLimit() <= 0 || request.getDrawTimeLimit() <= 0) {
             throw new GameServerException(ExceptionType.ROOM_CREATION_FAILED, "participants and time limit have to be positive integer");
         }
-        Room room = roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(),
-                from, sender, exceptionHandler);
-        Event event = new ServerCreateRoomEvent(room.getId(), room.getDrawTimeLimit(), room.getParticipantLimit(), room.getOwnerId());
-        Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
-        sendTo(message, from);
+        roomManager.createRoom(request.getDrawTimeLimit(), request.getParticipantLimit(), from, sender, exceptionHandler);
     }
 
     private void handleJoinRoomEvent(ClientJoinRoomEvent request, User from) throws GameServerException {
         Room room = roomManager.getRoom(request.getRoomID());
         room.addUser(from);
-        room.broadCastRoomUpdateEvent();
     }
 
     private void handleChangeRoomEvent(ClientChangeRoomSettingEvent request, User from) throws GameServerException {
@@ -107,7 +94,6 @@ public class MessageHandler {
             throw new GameServerException(ExceptionType.UNAUTHORIZED);
         }
         room.changeSettings(request.getDrawTimeLimit(), request.getParticipantLimit());
-        room.broadCastRoomUpdateEvent();
     }
 
     private void handleGameReadyEvent(ClientReadyEvent request, User from) throws GameServerException {

@@ -1,6 +1,7 @@
 package domain;
 
 import dto.event.Event;
+import dto.event.server.ServerCreateRoomEvent;
 import dto.event.server.ServerRoomUpdateEvent;
 import exception.ExceptionType;
 import exception.ExceptionHandler;
@@ -41,11 +42,15 @@ public class Room {
         this.chat = new Chat(this);
         this.gameSetter = new GameSetter(this);
         addUser(owner);
+        Event event = new ServerCreateRoomEvent(getId(), getDrawTimeLimit(), getParticipantLimit(), getOwnerId());
+        Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
+        broadcast(message);
     }
 
-    public void changeSettings(int drawTimeLimit, int participantLimit) {
+    public void changeSettings(int drawTimeLimit, int participantLimit) throws GameServerException {
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
+        broadCastRoomUpdateEvent();
     }
 
     public void addUser(User user) throws GameServerException {
@@ -56,6 +61,7 @@ public class Room {
         userMap.put(user.getId(), user);
         readyStatusMap.put(user.getId(), false);
         user.joinRoom(id);
+        broadCastRoomUpdateEvent();
     }
 
     public boolean isThereUser(int userId) {
@@ -90,6 +96,7 @@ public class Room {
                 userMap.values().stream()
                         .filter(u -> !u.equals(owner)
                         ).toList());
+        broadCastRoomUpdateEvent();
     }
 
     public int getId() {
