@@ -51,7 +51,7 @@ public class MessageHandlerManager {
         if (handler != null) {
             handler.handle(msg, from);
         } else {
-            throw new GameServerException(ExceptionType.UNKNOWN_EVENT_TYPE, "event type: " + msg.getType());
+            throw new GameServerException(ExceptionType.UNKNOWN_MESSAGE_TYPE, "event type: " + msg.getType());
         }
     }
 
