@@ -46,6 +46,9 @@ public class Room {
     }
 
     public void changeSettings(int drawTimeLimit, int participantLimit) throws GameServerException {
+        if (drawTimeLimit == this.drawTimeLimit && participantLimit == this.participantLimit) {
+            return;
+        }
         this.drawTimeLimit = drawTimeLimit;
         this.participantLimit = participantLimit;
         broadCastRoomUpdateEvent();
