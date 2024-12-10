@@ -8,7 +8,7 @@ import domain.User;
 import exception.ExceptionType;
 import exception.ExceptionHandler;
 import manager.ConnectionManager;
-import message.MessageHandler;
+import manager.MessageHandlerManager;
 import message.Message;
 import dto.event.client.ClientLoginEvent;
 import dto.event.server.ServerLoginEvent;
@@ -17,16 +17,16 @@ import exception.GameServerException;
 
 public class ConnectionRunner implements Runnable{
     private final ConnectionManager connectionManager;
-    private final MessageHandler messageHandler;
+    private final MessageHandlerManager messageHandlerManager;
     private final ExceptionHandler exceptionHandler;
     private final Sender sender;
     private final int id;
 
     public ConnectionRunner(int id, ConnectionManager connectionManager, Sender sender,
-                            MessageHandler messageHandler, ExceptionHandler exceptionHandler){
+                            MessageHandlerManager messageHandlerManager, ExceptionHandler exceptionHandler){
         this.connectionManager = connectionManager;
         this.sender = sender;
-        this.messageHandler = messageHandler;
+        this.messageHandlerManager = messageHandlerManager;
         this.id = id;
         this.exceptionHandler = exceptionHandler;
     }
@@ -52,7 +52,7 @@ public class ConnectionRunner implements Runnable{
 
     private void handleMessageWith(User user) throws GameServerException, InterruptedException {
         Message msgFromClient = getMessageFromClient();
-        messageHandler.handle(msgFromClient, user);
+        messageHandlerManager.handle(msgFromClient, user);
     }
 
     private void register() throws GameServerException {

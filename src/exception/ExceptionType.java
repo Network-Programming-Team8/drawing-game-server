@@ -40,7 +40,10 @@ public enum ExceptionType {
     NOT_ACCEPTING_VOTE("E501", "It is not the voting time."),
 
     // **Permission Errors**
-    UNAUTHORIZED("E600", "An unauthorized user attempted to change the settings.");
+    UNAUTHORIZED("E600", "An unauthorized user attempted to change the settings."),
+
+    // **Message Errors**
+    UNKNOWN_EVENT_TYPE("E700", "Unsupported event type");
 
     private final String errorCode;
     private final String errorMessage;

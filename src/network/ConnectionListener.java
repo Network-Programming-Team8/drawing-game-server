@@ -3,7 +3,7 @@ package network;
 import exception.ConnectionException;
 import exception.ExceptionType;
 import exception.ExceptionHandler;
-import message.MessageHandler;
+import manager.MessageHandlerManager;
 import manager.ConnectionManager;
 
 import java.io.IOException;
@@ -16,14 +16,14 @@ public class ConnectionListener {
 
     private final ConnectionManager connectionManager;
     private final Sender sender;
-    private final MessageHandler messageHandler;
+    private final MessageHandlerManager messageHandlerManager;
     private final ExceptionHandler exceptionHandler;
 
     public ConnectionListener(ConnectionManager connectionManager, Sender sender,
-                              MessageHandler messageHandler, ExceptionHandler exceptionHandler){
+                              MessageHandlerManager messageHandlerManager, ExceptionHandler exceptionHandler){
         this.connectionManager = connectionManager;
         this.sender = sender;
-        this.messageHandler = messageHandler;
+        this.messageHandlerManager = messageHandlerManager;
         this.exceptionHandler = exceptionHandler;
     }
 
@@ -36,7 +36,7 @@ public class ConnectionListener {
                 int connectionId = connect(socket);
                 Thread connectionThread = new Thread(
                         new ConnectionRunner(connectionId, connectionManager, sender,
-                                messageHandler, exceptionHandler));
+                                messageHandlerManager, exceptionHandler));
                 connectionThread.start();
             }
         } catch (Exception e){
