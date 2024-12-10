@@ -42,9 +42,7 @@ public class Room {
         this.chat = new Chat(this);
         this.gameSetter = new GameSetter(this);
         addUser(owner);
-        Event event = new ServerCreateRoomEvent(getId(), getDrawTimeLimit(), getParticipantLimit(), getOwnerId());
-        Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
-        broadcast(message);
+        broadcastRoomCreateEvent();
     }
 
     public void changeSettings(int drawTimeLimit, int participantLimit) throws GameServerException {
@@ -169,6 +167,12 @@ public class Room {
             return;
         }
         throw new GameServerException(ExceptionType.USER_IS_NOT_IN_ROOM);
+    }
+
+    private void broadcastRoomCreateEvent() throws GameServerException {
+        Event event = new ServerCreateRoomEvent(getId(), getDrawTimeLimit(), getParticipantLimit(), getOwnerId());
+        Message message = new Message(SERVER_CREATE_ROOM_EVENT, event);
+        broadcast(message);
     }
 
     public void broadCastRoomUpdateEvent() throws GameServerException {
